@@ -8,7 +8,7 @@ export class ExtractorService {
       throw new Error("Invalid URL provided.");
     }
     const wsChromeEndpointUrl =
-      "ws://127.0.0.1:9222/devtools/browser/c3c1178d-b510-4877-9d06-56e65536cf15";
+      "ws://127.0.0.1:9222/devtools/browser/2cca320a-4c23-4493-b36e-8a0f49ba0ee4";
     const browser = await puppeteer.connect({
       browserWSEndpoint: wsChromeEndpointUrl
     });
