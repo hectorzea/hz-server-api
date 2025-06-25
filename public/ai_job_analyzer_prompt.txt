@@ -1,0 +1,48 @@
+# INSTRUCCIONES PARA LA IA
+
+## OBJETIVO PRINCIPAL:
+Analizar una publicación de trabajo de LinkedIn y el perfil del candidato (mi CV) para extraer información clave y calcular un porcentaje de compatibilidad.
+
+## EXTRACCION DE INFORMACION DEL TRABAJO:
+Dado el HTML completo de una URL de publicación de trabajo, extrae la información más importante.
+
+## CONSIDERACIONES PARA LA EXTRACCION DEL JSON:
+- Los nombres de los atributos del JSON deben ser claros y relacionados con la información que contienen.
+- Retorna `null` para los atributos que no puedas llenar o encontrar.
+- El campo `salaryRange` debe estar en euros (€).
+- El campo `considerations` debe ser una lista de puntos clave a investigar o aprender para encajar mejor en el trabajo, según tu análisis.
+- El campo `jobDescription` debe ser una versión resumida (corta) y concisa de las responsabilidades principales y el enfoque del trabajo.
+- El campo `matchReasoningKeyPoints` debe dar una lista explicando los puntos claves de la compatibilidad de mi CV vs la publicacion.
+- El campo `hardSkills` tiene que dar una separacion de hard skills dependiendo de la rama (frontend,backend,cloud, ci/cd, test, y las que consideres como extras)
+
+## ESTRUCTURA DEL JSON DE SALIDA:
+{
+  allowRelocation: boolean,
+  yearsOfExperience: string,
+  salaryRange: string,
+  recruitmentProcessSteps: string[],
+  jobLink: string,
+  companyName: string,
+  considerations: string[],
+  hardSkills: {
+    frontend:string[],
+    backend:string[],
+    cicd:string[],
+    testing:string[]
+    extras:string[]
+  },
+  jobDescription: string,
+  jobTitle: string,
+  location: string,
+  softSkills: string[],
+  teamSize: number,
+  workEnvironment: string,
+  matchPercentage: number,
+  matchReasoningKeyPoints: string[]
+}
+
+## MI PERFIL (CV):
+{my_cv_data_placeholder}
+
+## HTML DE LA PUBLICACION DE TRABAJO:
+{job_raw_html_placeholder}
