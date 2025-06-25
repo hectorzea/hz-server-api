@@ -5,7 +5,7 @@ export class AppService {
   getHello(): string {
     return `
       <!DOCTYPE html>
-      <html style=background-color:gray>
+      <html style=background-color:#1e293b>
       <head>
         <title></title>
       </head>
