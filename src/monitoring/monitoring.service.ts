@@ -8,7 +8,7 @@ export class MonitoringService implements OnModuleInit {
   private httpRequestCounter: Counter<string>; // Declarar la métrica con el tipo correcto
 
   onModuleInit() {
-    client.collectDefaultMetrics({ register: this.register });
+    // client.collectDefaultMetrics({ register: this.register });
 
     // Inicializar la métrica con el tipo Counter
     this.httpRequestCounter = new client.Counter({

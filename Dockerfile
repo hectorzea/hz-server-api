@@ -13,7 +13,7 @@ RUN npm install --production
 COPY dist ./dist
 
 # Exponer el puerto en el que la aplicación NestJS escuchará (informativo)
-EXPOSE 3000
+EXPOSE 3001
 
 # Comando para ejecutar la aplicación
 CMD [ "node", "dist/main" ]

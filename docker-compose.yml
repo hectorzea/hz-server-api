@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  # --- Servicio de la API NestJS ---
+  hz-api: # << El nombre del servicio para Docker Compose (usaremos 'hz-api' para conectar)
+    build: # << Construye la imagen desde el Dockerfile en la ruta especificada
+      context: /home/hectorzea/api/hz-server # << Ruta al directorio de tu API en el host
+      dockerfile: Dockerfile
+    container_name: hz-api-container # Nombre del contenedor
+    ports:
+      - "8080:3001" # Mapea puerto 8080 del host al 3000 del contenedor
+    restart: unless-stopped
+    # Si tu API necesita variables de entorno, puedes añadirlas aquí
+    # environment:
+    #   - DATABASE_URL=...
+
+  # --- Servicio de Prometheus ---
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - /home/hectorzea/docker/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - /home/hectorzea/docker/prometheus/data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    restart: unless-stopped
+    # Prometheus ahora accederá a 'hz-api:3000/metrics' y no a localhost
+    # La conectividad es automática en la red de Docker Compose.
+
+  # --- Servicio de Grafana ---
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - /home/hectorzea/docker/grafana/data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=tu_password_segura_de_grafana # << ¡¡¡CAMBIA ESTA CONTRASEÑA!!!
+    restart: unless-stopped
+    depends_on:
+      - prometheus # Grafana depende de Prometheus
+      - hz-api # Grafana también puede depender de la API para asegurar su arranque
