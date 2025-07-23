@@ -4,7 +4,7 @@ import { MonitoringInterceptor } from "./monitoring/monitoring.interceptor";
 import { MonitoringService } from "./monitoring/monitoring.service";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalInterceptors(
     new MonitoringInterceptor(app.get(MonitoringService))
   );
