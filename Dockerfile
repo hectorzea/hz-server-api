@@ -12,8 +12,11 @@ RUN npm install --production
 # Copiar el código compilado (la carpeta dist/) desde tu contexto de build (tu servidor)
 # COPY dist ./dist
 
+# Copiar el código compilado (la carpeta dist/) desde tu contexto de build (tu servidor)
+# COPY dist ./dist
+
 # Exponer el puerto en el que la aplicación NestJS escuchará (informativo)
-EXPOSE 3001
+# EXPOSE 3001
 
 # Comando para ejecutar la aplicación
 CMD [ "node", "dist/main" ]
