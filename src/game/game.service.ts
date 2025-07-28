@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import {
   Game,
   GameDocument,
@@ -17,30 +17,18 @@ export class GameService {
     return createdGame.save();
   }
 
-  // backend/src/game/game.service.ts
-  // ... (imports y constructor) ...
-
   async getMulliganWinratesForAllCards(
-    type: "initial" | "discarded", // Indica si analizamos cartas iniciales o descartadas
-    myClassId?: string // Opcional: para filtrar por tu clase
+    type: "initial" | "discarded", // iniciales o descartadas
+    myClassId?: string // para filtrar por tu clase
   ): Promise<WinRateMulliganResponse[]> {
-    let unwindField: string; // Campo del array a "desglosar"
+    let unwindField: string;
     const initialMatch: InitialMatchProps = { myClassId: "" }; // Condiciones de filtro iniciales
 
-    // 1. Determinar qué campo de mulligan analizar
+    // 1. Determinar qué campo de mulligan analizar (Initial Cards / Discarded Cards)
     if (type === "initial") {
       unwindField = "$mulligan.initialCardsIds"; // Apunta al array de IDs de cartas iniciales
-    } else if (type === "discarded") {
-      unwindField = "$mulligan.discardedCardsIds"; // Apunta al array de IDs de cartas descartadas
     } else {
-      throw new BadRequestException(
-        'Tipo de mulligan no válido. Debe ser "initial" o "discarded".'
-      );
-    }
-
-    // 2. Aplicar filtro opcional por tu clase
-    if (myClassId) {
-      initialMatch.myClassId = myClassId.toUpperCase();
+      unwindField = "$mulligan.discardedCardsIds"; // Apunta al array de IDs de cartas descartadas
     }
 
     const pipeline = [
@@ -84,7 +72,6 @@ export class GameService {
     ];
 
     const results = await this.gameModel.aggregate(pipeline).exec();
-    console.log("results", results);
     return results as WinRateMulliganResponse[];
   }
 }
