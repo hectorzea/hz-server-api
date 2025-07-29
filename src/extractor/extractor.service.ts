@@ -52,4 +52,53 @@ export class ExtractorService {
       });
     }
   }
+  async getMulliganCards(): Promise<any> {
+    const url = "https://hsreplay.net/replay/SLymfApzBmCChYWqjWSVpV";
+    const browser = await puppeteer.launch({ headless: false });
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1280, height: 720 });
+    await page.goto(url, { waitUntil: "networkidle0" });
+    const content = await page.evaluate(() => {
+      const playerDivs = [...document.querySelectorAll("div.player")];
+
+      const myPlayerDiv = playerDivs[1];
+      const myCardsSelected = [
+        ...myPlayerDiv.querySelectorAll("div.card:not(.mulligan)")
+      ];
+      const myCardsSelectedNames = myCardsSelected.map((div) => {
+        return div.querySelector("h1")?.textContent;
+      });
+      const myCardsMulligan = [
+        ...myPlayerDiv.querySelectorAll("div.card.mulligan")
+      ];
+      const myCardsMulliganNames = myCardsMulligan.map((div) => {
+        return div.querySelector("h1")?.textContent;
+      });
+
+      return {
+        mulligan: {
+          initialCardsIds: myCardsSelectedNames,
+          discardedCardsIds: myCardsMulliganNames
+        }
+      };
+    });
+
+    const rawHeroesString = await page.$eval(
+      "head > meta[name='description']",
+      (element) => element.content
+    );
+
+    const data = rawHeroesString
+      .split(" ")
+      .filter((e) => e.includes("("))
+      .map((s) => s.replace(/[()]/g, ""))
+      .map((s) => s.toUpperCase());
+    console.log(content);
+
+    const payload = { ...content, myClassId: data[0], oponentClassId: data[1] };
+
+    await browser.close();
+
+    return payload;
+  }
 }
