@@ -19,10 +19,10 @@ export class GameService {
 
   async getMulliganWinratesForAllCards(
     type: "initial" | "discarded", // iniciales o descartadas
-    myClassId?: string // para filtrar por tu clase
+    myClassId: string // para filtrar por tu clase
   ): Promise<WinRateMulliganResponse[]> {
     let unwindField: string;
-    const initialMatch: InitialMatchProps = { myClassId: "" }; // Condiciones de filtro iniciales
+    const initialMatch: InitialMatchProps = { myClassId }; // Condiciones de filtro iniciales
 
     // 1. Determinar qué campo de mulligan analizar (Initial Cards / Discarded Cards)
     if (type === "initial") {
@@ -32,26 +32,23 @@ export class GameService {
     }
 
     const pipeline = [
-      { $match: initialMatch }, // 3. Primera etapa: Filtrar por clase si aplica
-      { $unwind: unwindField }, // 4. Clave aquí: "Desglosar" el array
+      { $match: initialMatch },
+      { $unwind: unwindField },
       {
         $group: {
-          // 5. Agrupar por carta individual
-          _id: unwindField, // El _id de cada grupo será el cardId
-          totalGames: { $sum: 1 }, // Contar cuántas veces aparece esa carta
+          _id: unwindField,
+          totalGames: { $sum: 1 },
           wins: {
             $sum: {
               $cond: [{ $eq: ["$matchResult", MatchResultEnum.WIN] }, 1, 0]
             }
-          } // Contar victorias
+          }
         }
       },
       {
         $project: {
-          // 6. Proyección y Cálculo final
-          myClassId,
           _id: 0,
-          cardId: "$_id", // Renombrar _id a cardId
+          cardId: "$_id",
           totalGames: 1,
           wins: 1,
           winrate: {
@@ -67,8 +64,32 @@ export class GameService {
             }
           }
         }
+      },
+      {
+        // NUEVA ETAPA: $lookup para unir con la colección 'cards'
+        $lookup: {
+          from: "cards", // Nombre de la colección de cartas en MongoDB (NestJS la pluraliza)
+          localField: "cardId", // El campo en el documento actual de la pipeline (del $project anterior)
+          foreignField: "id", // El campo en la colección 'cards' que coincide con 'cardId'
+          as: "cardDetails" // Nombre del nuevo array de campo que contendrá los detalles de la carta
+        }
+      },
+      {
+        // Puedes usar 'preserveNullAndEmptyArrays: true' si quieres mantener los documentos sin match. (cartas not found)
+        $unwind: { path: "$cardDetails", preserveNullAndEmptyArrays: true }
+      },
+      {
+        // NUEVA ETAPA: $project para seleccionar los campos finales y limpiar
+        $project: {
+          cardId: 1,
+          totalGames: 1,
+          wins: 1,
+          winrate: 1,
+          // Proyectar el nombre y la imagen de los detalles de la carta
+          cardName: "$cardDetails.name",
+          cardImageUrl: "$cardDetails.imagenUrl"
+        }
       }
-      // { $sort: { winrate: -1 } } // 7. Ordenar por winrate (descendente)
     ];
 
     const results = await this.gameModel.aggregate(pipeline).exec();

@@ -4,12 +4,14 @@ import { Card } from "./schemas/card.schema";
 import { MatchResultRawData } from "src/common/interfaces/hearthstone-cards.interface";
 import { Game, WinRateMulliganResponse } from "src/game/schemas/game.schema";
 import { GameService } from "src/game/game.service";
+import { ExtractorService } from "src/extractor/extractor.service";
 
 @Controller("api/hearthstone")
 export class HearthstoneController {
   constructor(
     private readonly hearthstoneService: HearthstoneService,
-    private readonly gameService: GameService
+    private readonly gameService: GameService,
+    private readonly extractorService: ExtractorService
   ) {}
   @Get("cards")
   getCardByName(@Query("cardName") cardName: string): Promise<Card | null> {
@@ -27,5 +29,10 @@ export class HearthstoneController {
       "initial",
       "DEATHKNIGHT"
     );
+  }
+
+  @Get("scrape-mulligan")
+  getScrappedMulliganCards(): Promise<any> {
+    return this.extractorService.getMulliganCards();
   }
 }

@@ -52,11 +52,11 @@ export class HearthstoneService implements OnModuleInit {
   async saveMatchResults(body: MatchResultRawData): Promise<Game> {
     try {
       const initialCardsRawString = body.initialCards
-        .split(",")
+        .split(";")
         .map((cardName) => cardName.trim())
         .map((cardName) => this.getCardByName(cardName));
       const discardedCardsRawString = body.discardedCards
-        .split(",")
+        .split(";")
         .map((cardName) => cardName.trim())
         .map((cardName) => this.getCardByName(cardName));
       const initialCardsIdsResponse = await Promise.all(initialCardsRawString);
@@ -79,6 +79,7 @@ export class HearthstoneService implements OnModuleInit {
           discardedCardsIds
         }
       };
+
       const matchResult = await this.gameService.create(payload);
       return matchResult;
     } catch (error) {
