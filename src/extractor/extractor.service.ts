@@ -57,10 +57,11 @@ export class ExtractorService {
       });
     }
   }
+
   async getMulliganCards(
     matchResultRequest: MatchResultRawData
   ): Promise<MatchResult> {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720 });
     await page.goto(matchResultRequest.matchUrl, { waitUntil: "networkidle0" });
@@ -81,12 +82,10 @@ export class ExtractorService {
         ...myPlayerDiv.querySelectorAll("div.card.mulligan")
       ];
 
-      //todo ver como hacer un tipado correcto con esto?
       const myCardsMulliganNames = myCardsMulligan.map((div) => {
         return div.querySelector("h1")?.textContent;
       }) as string[];
 
-      // TURNOS
       const turnElement =
         document.querySelector("dl")?.childNodes[3]?.childNodes[1]?.textContent;
 
@@ -102,19 +101,30 @@ export class ExtractorService {
       (element) => element.content
     );
 
-    const data = rawHeroesString
-      .split(" ")
-      .filter((e) => e.includes("("))
-      .map((s) => s.replace(/[()]/g, ""))
-      .map((s) => s.toUpperCase());
+    const titulo = await page.title();
+    const partes = titulo.split("vs.");
+    const myUser = partes[0];
+    const enemyUser = partes[1].split("-")[0].trim();
+    const indexOfMyUser = rawHeroesString.indexOf(myUser);
+    const indexOfenemyUser = rawHeroesString.indexOf(enemyUser);
+    const textoDespuesDeUsuario = rawHeroesString.substring(
+      indexOfMyUser + myUser.length
+    );
+    const textoDespuesDeUsuarioEnemigo = rawHeroesString.substring(
+      indexOfenemyUser + enemyUser.length
+    );
+    const match = textoDespuesDeUsuario.match(/\(([^)]+)\)/);
+    const matchEnemy = textoDespuesDeUsuarioEnemigo.match(/\(([^)]+)\)/);
+
+    console.log(textoDespuesDeUsuario, textoDespuesDeUsuarioEnemigo);
 
     const payload: MatchResult = {
       numberOfTurns: content.numberOfTurns,
-      myClassId: data[0],
+      myClassId: match ? match[1].toUpperCase() : "",
       matchResult: matchResultRequest.win
         ? MatchResultEnum.WIN
         : MatchResultEnum.LOSS,
-      oponentClassId: data[1],
+      oponentClassId: matchEnemy ? matchEnemy[1].toUpperCase() : "",
       mulligan: {
         discardedCardsIds: content.discardedCardsIds,
         initialCardsIds: content.initialCardsIds
