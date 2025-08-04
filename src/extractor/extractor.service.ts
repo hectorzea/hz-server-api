@@ -1,5 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import * as puppeteer from "puppeteer";
+import {
+  MatchResult,
+  MatchResultRawData
+} from "src/common/interfaces/hearthstone-cards.interface";
+import { MatchResultEnum } from "src/game/schemas/game.schema";
 
 @Injectable()
 export class ExtractorService {
@@ -52,34 +57,43 @@ export class ExtractorService {
       });
     }
   }
-  async getMulliganCards(): Promise<any> {
-    const url = "https://hsreplay.net/replay/SLymfApzBmCChYWqjWSVpV";
+  async getMulliganCards(
+    matchResultRequest: MatchResultRawData
+  ): Promise<MatchResult> {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720 });
-    await page.goto(url, { waitUntil: "networkidle0" });
+    await page.goto(matchResultRequest.matchUrl, { waitUntil: "networkidle0" });
     const content = await page.evaluate(() => {
       const playerDivs = [...document.querySelectorAll("div.player")];
 
       const myPlayerDiv = playerDivs[1];
+
       const myCardsSelected = [
         ...myPlayerDiv.querySelectorAll("div.card:not(.mulligan)")
       ];
-      const myCardsSelectedNames = myCardsSelected.map((div) => {
+
+      const myCardsSelectedNames = myCardsSelected?.map((div) => {
         return div.querySelector("h1")?.textContent;
-      });
+      }) as string[];
+
       const myCardsMulligan = [
         ...myPlayerDiv.querySelectorAll("div.card.mulligan")
       ];
+
+      //todo ver como hacer un tipado correcto con esto?
       const myCardsMulliganNames = myCardsMulligan.map((div) => {
         return div.querySelector("h1")?.textContent;
-      });
+      }) as string[];
+
+      // TURNOS
+      const turnElement =
+        document.querySelector("dl")?.childNodes[3]?.childNodes[1]?.textContent;
 
       return {
-        mulligan: {
-          initialCardsIds: myCardsSelectedNames,
-          discardedCardsIds: myCardsMulliganNames
-        }
+        numberOfTurns: parseInt(turnElement!),
+        initialCardsIds: myCardsSelectedNames,
+        discardedCardsIds: myCardsMulliganNames
       };
     });
 
@@ -93,9 +107,19 @@ export class ExtractorService {
       .filter((e) => e.includes("("))
       .map((s) => s.replace(/[()]/g, ""))
       .map((s) => s.toUpperCase());
-    console.log(content);
 
-    const payload = { ...content, myClassId: data[0], oponentClassId: data[1] };
+    const payload: MatchResult = {
+      numberOfTurns: content.numberOfTurns,
+      myClassId: data[0],
+      matchResult: matchResultRequest.win
+        ? MatchResultEnum.WIN
+        : MatchResultEnum.LOSS,
+      oponentClassId: data[1],
+      mulligan: {
+        discardedCardsIds: content.discardedCardsIds,
+        initialCardsIds: content.initialCardsIds
+      }
+    };
 
     await browser.close();
 

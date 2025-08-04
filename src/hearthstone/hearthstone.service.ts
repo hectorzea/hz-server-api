@@ -11,15 +11,18 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import {
   CardInfo,
+  MatchResult,
   MatchResultRawData
 } from "src/common/interfaces/hearthstone-cards.interface";
+import { Game } from "src/game/schemas/game.schema";
+import { ExtractorService } from "src/extractor/extractor.service";
 import { GameService } from "src/game/game.service";
-import { Game, MatchResultEnum } from "src/game/schemas/game.schema";
 
 @Injectable()
 export class HearthstoneService implements OnModuleInit {
   constructor(
     @InjectModel(Card.name) private readonly cardModel: Model<Card>,
+    private readonly extractorService: ExtractorService,
     private readonly gameService: GameService
   ) {}
 
@@ -49,17 +52,20 @@ export class HearthstoneService implements OnModuleInit {
     }
   }
 
-  async saveMatchResults(body: MatchResultRawData): Promise<Game> {
+  async saveMatchResults(matchData: MatchResultRawData): Promise<Game> {
     try {
-      const initialCardsRawString = body.initialCards
-        .split(";")
-        .map((cardName) => cardName.trim())
-        .map((cardName) => this.getCardByName(cardName));
-      const discardedCardsRawString = body.discardedCards
-        .split(";")
-        .map((cardName) => cardName.trim())
-        .map((cardName) => this.getCardByName(cardName));
-      const initialCardsIdsResponse = await Promise.all(initialCardsRawString);
+      const data: MatchResult =
+        await this.extractorService.getMulliganCards(matchData);
+
+      const discardedCardsRawString = data.mulligan.discardedCardsIds.map(
+        (cardName) => this.getCardByName(cardName)
+      );
+
+      const initial = data.mulligan.initialCardsIds.map((cardName) =>
+        this.getCardByName(cardName)
+      );
+
+      const initialCardsIdsResponse = await Promise.all(initial);
       const discardedCardsIdsResponse = await Promise.all(
         discardedCardsRawString
       );
@@ -69,17 +75,14 @@ export class HearthstoneService implements OnModuleInit {
       const discardedCardsIds = discardedCardsIdsResponse
         .map((c) => c?.id)
         .filter((e) => e !== undefined);
-      const payload: Game = {
-        myClassId: body.myClassId,
-        oponentClassId: body.classOponentId,
-        numberOfTurns: parseInt(body.turnsDuration),
-        matchResult: body.win ? MatchResultEnum.WIN : MatchResultEnum.LOSS,
+
+      const payload = {
+        ...data,
         mulligan: {
           initialCardsIds,
           discardedCardsIds
         }
       };
-
       const matchResult = await this.gameService.create(payload);
       return matchResult;
     } catch (error) {

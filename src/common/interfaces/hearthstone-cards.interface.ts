@@ -1,3 +1,5 @@
+import { MatchResultEnum } from "src/game/schemas/game.schema";
+
 export interface HearthstoneCardInfo {
   cardId: string;
   name: string;
@@ -44,7 +46,7 @@ export interface MatchResult {
   myClassId: string;
   oponentClassId: string;
   numberOfTurns: number;
-  matchResult: "WIN" | "DEFEAT";
+  matchResult: MatchResultEnum;
   mulligan: {
     initialCardsIds: string[];
     discardedCardsIds: string[];
@@ -52,10 +54,6 @@ export interface MatchResult {
 }
 
 export interface MatchResultRawData {
-  myClassId: string;
-  classOponentId: string;
-  turnsDuration: string;
   win: boolean;
-  initialCards: string;
-  discardedCards: string;
+  matchUrl: string;
 }
