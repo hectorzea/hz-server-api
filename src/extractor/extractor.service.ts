@@ -140,7 +140,7 @@ export class ExtractorService {
       };
     });
 
-    return { initialCardNames: content.initialCardNames };
+    return { initialCardsNames: content.initialCardNames };
   }
 
   async prepareMatchPayload(
@@ -154,12 +154,12 @@ export class ExtractorService {
     const discardedCardsNames = await this.getMatchDiscardedCardsNames(page);
     const initialCardsNames = await this.getMatchInitialCardsNames(page);
     return {
-      numberOfTurns,
-      matchResult,
-      myClassId,
-      oponentClassId,
-      discardedCardsNames,
-      initialCardsNames
+      ...numberOfTurns,
+      ...matchResult,
+      ...myClassId,
+      ...oponentClassId,
+      ...discardedCardsNames,
+      ...initialCardsNames
     };
   }
 
@@ -170,15 +170,13 @@ export class ExtractorService {
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720 });
     await page.goto(matchResultRequest.matchUrl, { waitUntil: "networkidle0" });
-    const payload = await this.prepareMatchPayload(page, matchResultRequest);
+    const matchScrappedData = await this.prepareMatchPayload(
+      page,
+      matchResultRequest
+    );
 
     return {
-      numberOfTurns: payload.numberOfTurns.numberOfTurns,
-      myClassId: payload.myClassId.myClassId,
-      matchResult: payload.matchResult.matchResult,
-      oponentClassId: payload.oponentClassId.oponentClassId,
-      discardedCardNames: payload.discardedCardsNames.discardedCardNames,
-      initialCardsNames: payload.initialCardsNames.initialCardNames
+      ...matchScrappedData
     };
   }
 }
