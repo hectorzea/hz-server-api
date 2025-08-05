@@ -57,3 +57,12 @@ export interface MatchResultRawData {
   win: boolean;
   matchUrl: string;
 }
+
+export interface ScrappedMatchResult {
+  numberOfTurns: number;
+  myClassId: string;
+  matchResult: MatchResultEnum;
+  oponentClassId: string;
+  discardedCardNames: string[];
+  initialCardsNames: string[];
+}
