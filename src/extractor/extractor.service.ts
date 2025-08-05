@@ -143,7 +143,7 @@ export class ExtractorService {
     return { initialCardsNames: content.initialCardNames };
   }
 
-  async prepareMatchPayload(
+  async scrapeMatchData(
     page: puppeteer.Page,
     matchResultRequest: MatchResultRawData
   ) {
@@ -170,7 +170,7 @@ export class ExtractorService {
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720 });
     await page.goto(matchResultRequest.matchUrl, { waitUntil: "networkidle0" });
-    const matchScrappedData = await this.prepareMatchPayload(
+    const matchScrappedData = await this.scrapeMatchData(
       page,
       matchResultRequest
     );
