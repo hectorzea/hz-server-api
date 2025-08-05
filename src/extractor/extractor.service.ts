@@ -106,37 +106,6 @@ export class ExtractorService {
     return { matchResult: result ? MatchResultEnum.WIN : MatchResultEnum.LOSS };
   }
 
-  async getMatchMulligan(page: puppeteer.Page) {
-    const content = await page.evaluate(() => {
-      const playerDivs = [...document.querySelectorAll("div.player")];
-      const myPlayerDiv = playerDivs[1];
-      const myCardsSelected = [
-        ...myPlayerDiv.querySelectorAll("div.card:not(.mulligan)")
-      ];
-      const myCardsSelectedNames = myCardsSelected?.map((div) => {
-        return div.querySelector("h1")?.textContent;
-      }) as string[];
-      const myCardsMulligan = [
-        ...myPlayerDiv.querySelectorAll("div.card.mulligan")
-      ];
-      const myCardsMulliganNames = myCardsMulligan.map((div) => {
-        return div.querySelector("h1")?.textContent;
-      }) as string[];
-
-      return {
-        initialCardsNames: myCardsSelectedNames,
-        discardedCardsNames: myCardsMulliganNames
-      };
-    });
-
-    const mulligan = {
-      initialCardsNames: content.initialCardsNames,
-      discardedCardsNames: content.discardedCardsNames
-    };
-
-    return mulligan;
-  }
-
   async getMatchDiscardedCardsNames(page: puppeteer.Page) {
     const content = await page.evaluate(() => {
       const playerDivs = [...document.querySelectorAll("div.player")];
