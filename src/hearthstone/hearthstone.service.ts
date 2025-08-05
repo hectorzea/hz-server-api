@@ -2,6 +2,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
   OnModuleInit
 } from "@nestjs/common";
 import * as fs from "fs";
@@ -20,6 +21,7 @@ import { GameService } from "src/game/game.service";
 
 @Injectable()
 export class HearthstoneService implements OnModuleInit {
+  private readonly logger = new Logger(HearthstoneService.name);
   constructor(
     @InjectModel(Card.name) private readonly cardModel: Model<Card>,
     private readonly extractorService: ExtractorService,
@@ -54,6 +56,7 @@ export class HearthstoneService implements OnModuleInit {
 
   async saveMatchResults(matchData: MatchResultRawData): Promise<Game> {
     try {
+      this.logger.log(`Saving match with URL: ${matchData.matchUrl}`);
       const data: MatchResult =
         await this.extractorService.getMulliganCards(matchData);
 
