@@ -56,19 +56,20 @@ export class HearthstoneService implements OnModuleInit {
 
   async saveMatchResults(matchData: MatchResultRawData): Promise<Game> {
     try {
-      this.logger.log(`Saving match with URL: ${matchData.matchUrl}`);
-      const data: MatchResult =
-        await this.extractorService.getMulliganCards(matchData);
+      this.logger.log(`Match URL: ${matchData.matchUrl}`);
+      const dataFromMatchUrl: MatchResult =
+        await this.extractorService.getMatchUrlData(matchData);
 
-      const discardedCardsRawString = data.mulligan.discardedCardsIds.map(
+      const discardedCardsRawString =
+        dataFromMatchUrl.mulligan.discardedCardsIds.map((cardName) =>
+          this.getCardByName(cardName)
+        );
+
+      const initialCardsNames = dataFromMatchUrl.mulligan.initialCardsIds.map(
         (cardName) => this.getCardByName(cardName)
       );
 
-      const initial = data.mulligan.initialCardsIds.map((cardName) =>
-        this.getCardByName(cardName)
-      );
-
-      const initialCardsIdsResponse = await Promise.all(initial);
+      const initialCardsIdsResponse = await Promise.all(initialCardsNames);
       const discardedCardsIdsResponse = await Promise.all(
         discardedCardsRawString
       );
@@ -80,7 +81,7 @@ export class HearthstoneService implements OnModuleInit {
         .filter((e) => e !== undefined);
 
       const payload = {
-        ...data,
+        ...dataFromMatchUrl,
         mulligan: {
           initialCardsIds,
           discardedCardsIds

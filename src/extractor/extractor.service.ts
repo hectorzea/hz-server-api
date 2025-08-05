@@ -58,7 +58,7 @@ export class ExtractorService {
     }
   }
 
-  async getMulliganCards(
+  async getMatchUrlData(
     matchResultRequest: MatchResultRawData
   ): Promise<MatchResult> {
     const browser = await puppeteer.launch({ headless: true });
@@ -115,8 +115,6 @@ export class ExtractorService {
     );
     const match = textoDespuesDeUsuario.match(/\(([^)]+)\)/);
     const matchEnemy = textoDespuesDeUsuarioEnemigo.match(/\(([^)]+)\)/);
-
-    console.log(textoDespuesDeUsuario, textoDespuesDeUsuarioEnemigo);
 
     const payload: MatchResult = {
       numberOfTurns: content.numberOfTurns,

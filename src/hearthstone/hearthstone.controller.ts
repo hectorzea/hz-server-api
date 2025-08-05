@@ -23,8 +23,9 @@ export class HearthstoneController {
 
   @Get("mulligan")
   getMulligan(
-    @Query("classId") classId: string
+    @Query("classId") classId: string,
+    @Query("type") type: "initial" | "discarded"
   ): Promise<WinRateMulliganResponse[]> {
-    return this.gameService.getMulliganWinratesForAllCards("initial", classId);
+    return this.gameService.getMulliganWinratesForAllCards(type, classId);
   }
 }

@@ -18,11 +18,11 @@ export class GameService {
   }
 
   async getMulliganWinratesForAllCards(
-    type: "initial" | "discarded", // iniciales o descartadas
-    myClassId: string // para filtrar por tu clase
+    type: "initial" | "discarded", // Buscar por cartas que deje en mano (initial) o descartadas/mulligan (discarded)
+    myClassId: string // filtrar por clase ej (DEATHKNIGHT, DRUID)
   ): Promise<WinRateMulliganResponse[]> {
     let unwindField: string;
-    const initialMatch: InitialMatchProps = { myClassId }; // Condiciones de filtro iniciales
+    const initialMatch: InitialMatchProps = { myClassId }; // Condiciones de filtro iniciales puede extenderse
 
     // 1. Determinar qué campo de mulligan analizar (Initial Cards / Discarded Cards)
     if (type === "initial") {
@@ -75,7 +75,7 @@ export class GameService {
         }
       },
       {
-        // Puedes usar 'preserveNullAndEmptyArrays: true' si quieres mantener los documentos sin match. (cartas not found)
+        // Podemos usar 'preserveNullAndEmptyArrays: true' para mantener los documentos sin match. (cartas not found)
         $unwind: { path: "$cardDetails", preserveNullAndEmptyArrays: true }
       },
       {
