@@ -1,5 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import * as puppeteer from "puppeteer";
+import {
+  MatchResultRawData,
+  ScrappedMatchResult
+} from "src/common/interfaces/hearthstone-cards.interface";
+import { MatchResultEnum } from "src/game/schemas/game.schema";
 
 @Injectable()
 export class ExtractorService {
@@ -51,5 +56,127 @@ export class ExtractorService {
         cause: error
       });
     }
+  }
+
+  async getMatchNumberOfTurns(page: puppeteer.Page) {
+    const content = await page.evaluate(() => {
+      const numberOfTurns =
+        document.querySelector("dl")?.childNodes[3]?.childNodes[1]?.textContent;
+      return numberOfTurns;
+    });
+
+    return { numberOfTurns: parseInt(content!) };
+  }
+
+  async getMatchClassId(page: puppeteer.Page) {
+    const titulo = await page.title();
+    //este es para obtener la clase, pero necesito saber mi nombre de usuario
+    const rawHeroesString = await page.$eval(
+      "head > meta[name='description']",
+      (element) => element.content
+    );
+    const titleParts = titulo.split("vs.");
+    const myUser = titleParts[0];
+    const indexOfMyUser = rawHeroesString.indexOf(myUser);
+    const textoDespuesDeUsuario = rawHeroesString.substring(
+      indexOfMyUser + myUser.length
+    );
+    const match = textoDespuesDeUsuario.match(/\(([^)]+)\)/);
+
+    return { myClassId: match ? match[1].toUpperCase() : "" };
+  }
+
+  async getMatchOponentClassId(page: puppeteer.Page) {
+    const rawHeroesString = await page.$eval(
+      "head > meta[name='description']",
+      (element) => element.content
+    );
+    const titulo = await page.title();
+    const partes = titulo.split("vs.");
+    const enemyUser = partes[1].split("-")[0].trim();
+    const indexOfenemyUser = rawHeroesString.indexOf(enemyUser);
+    const textoDespuesDeUsuarioEnemigo = rawHeroesString.substring(
+      indexOfenemyUser + enemyUser.length
+    );
+    const matchEnemy = textoDespuesDeUsuarioEnemigo.match(/\(([^)]+)\)/);
+    return { oponentClassId: matchEnemy ? matchEnemy[1].toUpperCase() : "" };
+  }
+
+  getMatchResult(result: boolean) {
+    return { matchResult: result ? MatchResultEnum.WIN : MatchResultEnum.LOSS };
+  }
+
+  async getMatchDiscardedCardsNames(page: puppeteer.Page) {
+    const content = await page.evaluate(() => {
+      const playerDivs = [...document.querySelectorAll("div.player")];
+      const myPlayerDiv = playerDivs[1];
+      const myCardsMulligan = [
+        ...myPlayerDiv.querySelectorAll("div.card.mulligan")
+      ];
+      const myCardsMulliganNames = myCardsMulligan.map((div) => {
+        return div.querySelector("h1")?.textContent;
+      }) as string[];
+
+      return {
+        discardedCardsNames: myCardsMulliganNames
+      };
+    });
+
+    return { discardedCardNames: content.discardedCardsNames };
+  }
+
+  async getMatchInitialCardsNames(page: puppeteer.Page) {
+    const content = await page.evaluate(() => {
+      const playerDivs = [...document.querySelectorAll("div.player")];
+      const myPlayerDiv = playerDivs[1];
+      const myCardsSelected = [
+        ...myPlayerDiv.querySelectorAll("div.card:not(.mulligan)")
+      ];
+      const initialCardNames = myCardsSelected?.map((div) => {
+        return div.querySelector("h1")?.textContent;
+      }) as string[];
+      return {
+        initialCardNames: initialCardNames
+      };
+    });
+
+    return { initialCardsNames: content.initialCardNames };
+  }
+
+  async scrapeMatchData(
+    page: puppeteer.Page,
+    matchResultRequest: MatchResultRawData
+  ) {
+    const numberOfTurns = await this.getMatchNumberOfTurns(page);
+    const matchResult = this.getMatchResult(matchResultRequest.win);
+    const myClassId = await this.getMatchClassId(page);
+    const oponentClassId = await this.getMatchOponentClassId(page);
+    const discardedCardsNames = await this.getMatchDiscardedCardsNames(page);
+    const initialCardsNames = await this.getMatchInitialCardsNames(page);
+    return {
+      ...numberOfTurns,
+      ...matchResult,
+      ...myClassId,
+      ...oponentClassId,
+      ...discardedCardsNames,
+      ...initialCardsNames
+    };
+  }
+
+  async scrapeMatchUrl(
+    matchResultRequest: MatchResultRawData
+  ): Promise<ScrappedMatchResult> {
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1280, height: 720 });
+    await page.goto(matchResultRequest.matchUrl, { waitUntil: "networkidle0" });
+    const matchScrappedData = await this.scrapeMatchData(
+      page,
+      matchResultRequest
+    );
+
+    return {
+      ...matchScrappedData
+    };
   }
 }

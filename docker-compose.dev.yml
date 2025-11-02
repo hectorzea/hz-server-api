@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-dev-hz-api
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_dev_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: hz-api-mongo-db
+    restart: unless-stopped # Para que reinicie si se detiene inesperadamente
+
+volumes:
+  mongodb_dev_data: # Define el volumen persistente para los datos de desarrollo
