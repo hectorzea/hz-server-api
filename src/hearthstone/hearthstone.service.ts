@@ -125,15 +125,7 @@ export class HearthstoneService implements OnModuleInit {
   }
 
   async prePopulateCards(): Promise<void> {
-    const cardsJsonPath = path.join(
-      __dirname,
-      "..",
-      "..",
-      "src",
-      "hearthstone",
-      "data",
-      "cards.json"
-    );
+    const cardsJsonPath = path.join(__dirname, "data", "cards.json");
     const rawData = fs.readFileSync(cardsJsonPath, "utf8");
     const hearthstoneCards = JSON.parse(rawData) as CardInfo[];
 
