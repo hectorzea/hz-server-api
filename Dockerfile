@@ -37,4 +37,4 @@ COPY --from=builder /app/dist ./dist
 EXPOSE 3001
 
 # Comando para ejecutar la aplicación.
-CMD [ "npm", "run", "start:prod" ]
+CMD [ "node", "dist/main" ]
