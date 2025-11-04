@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  # --- Servicio de la API NestJS ---
+  # --- Servicio de la API NestJS  TODO MAPEAR DESPUES PROM Y GRAFANA DESPUES DE ENTENDERLOS / FUNC LOCAL WORKSAROUNDS---
   hz-api: # << El nombre del servicio para Docker Compose (usaremos 'hz-api' para conectar)
     build: # << Construye la imagen desde el Dockerfile en la ruta especificada
       context: /home/hectorzea/api/hz-server # << Ruta al directorio de tu API en el host

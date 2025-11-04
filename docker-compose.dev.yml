@@ -1,16 +1,24 @@
 version: "3.8"
 
 services:
-  mongodb:
+  mongodb-hz-api:
     image: mongo:latest
-    container_name: mongodb-dev-hz-api
     ports:
       - "27017:27017"
     volumes:
       - mongodb_dev_data:/data/db
-    environment:
-      MONGO_INITDB_DATABASE: hz-api-mongo-db
+    # environment:
+    #   MONGO_INITDB_DATABASE: hz-api-mongo-db
     restart: unless-stopped # Para que reinicie si se detiene inesperadamente
+  hz-server-api:
+    build:
+      context: ./ # << Ruta al directorio de tu API en el host
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001" # Mapea puerto 8080 del host al 3000 del contenedor
+    depends_on:
+      - mongodb-hz-api
+    restart: unless-stopped
 
 volumes:
   mongodb_dev_data: # Define el volumen persistente para los datos de desarrollo

@@ -1,8 +1,8 @@
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { MonitoringModule } from "./monitoring/monitoring.module";
-import { ExtractorModule } from "./extractor/extractor.module";
+// import { MonitoringModule } from "./monitoring/monitoring.module";
+// import { ExtractorModule } from "./extractor/extractor.module";
 // import { AiModule } from "./ai/ai.module";
 import { ConfigModule } from "@nestjs/config";
 import { TasksModule } from "./tasks/tasks.module";
@@ -15,8 +15,8 @@ import { MongooseModule } from "@nestjs/mongoose";
   imports: [
     ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGO_DB_CLUSTER_URL!),
-    MonitoringModule,
-    ExtractorModule,
+    // MonitoringModule,
+    // ExtractorModule,
     // AiModule
     TasksModule
     // HearthstoneModule
