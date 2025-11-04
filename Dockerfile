@@ -34,7 +34,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 
 # Exponer el puerto en el que la aplicación NestJS escuchará (informativo).
-EXPOSE 3000
+EXPOSE 3001
 
 # Comando para ejecutar la aplicación.
 CMD [ "node", "dist/main" ]
