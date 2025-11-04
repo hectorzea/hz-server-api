@@ -8,7 +8,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(
     new MonitoringInterceptor(app.get(MonitoringService))
   );
-  await app.listen(process.env.PORT ?? 3001);
+  await app.listen(10000);
 }
 //test
 bootstrap()
