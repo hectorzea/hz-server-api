@@ -15,6 +15,22 @@ $ npm install
 $ docker compose -f ./docker-compose.dev.yml up
 ```
 
+Si se desea programar full local cambiar
+
+```MONGO_DB_CLUSTER_URL=mongodb://mongodb-hz-api:27017/hs-server-api ```
+
+a 
+
+```MONGO_DB_CLUSTER_URL=mongodb://127.0.0.1:27017/hs-server-api ```
+
+asi el container de mongo levantado es reconocido por la maquina local.
+
+## Run hz-server-api / mongodb database with Docker Compose
+URL generada por el proyecto dockerizado
+```http://localhost:3001/api/tasks ```
+
+
+
 ## Run tests
 
 ```bash
@@ -39,7 +55,3 @@ $ npm run test:cov
 2- ir a linkedin y loguearse, cerrar ventana.
 
 3- ejecutar api
-
-## Run hz-server-api / mongodb database with Docker Compose
-URL generada por el proyecto dockerizado
-```http://localhost:3001/api/tasks ```
