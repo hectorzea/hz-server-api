@@ -8,12 +8,12 @@ async function bootstrap() {
   app.useGlobalInterceptors(
     new MonitoringInterceptor(app.get(MonitoringService))
   );
-  await app.listen(10000);
+  await app.listen(process.env.PORT ?? 3001);
 }
 //test
 bootstrap()
   .then(() => {
-    console.log(`Server is running on port ${process.env.PORT ?? 3001}`);
+    console.log(`Server is running on port ${process.env.PORT}`);
   })
   .catch((error) => {
     console.error("Error starting the server:", error);
