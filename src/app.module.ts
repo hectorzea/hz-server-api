@@ -3,7 +3,7 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 // import { MonitoringModule } from "./monitoring/monitoring.module";
 // import { ExtractorModule } from "./extractor/extractor.module";
-// import { AiModule } from "./ai/ai.module";
+import { AiModule } from "./ai/ai.module";
 import { ConfigModule } from "@nestjs/config";
 import { TasksModule } from "./tasks/tasks.module";
 // import { HearthstoneModule } from "./hearthstone/hearthstone.module";
@@ -17,7 +17,7 @@ import { MongooseModule } from "@nestjs/mongoose";
     MongooseModule.forRoot(process.env.MONGO_DB_CLUSTER_URL!),
     // MonitoringModule,
     // ExtractorModule,
-    // AiModule
+    AiModule,
     TasksModule
     // HearthstoneModule
     // HearthstoneApiModule
