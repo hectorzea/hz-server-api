@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   Logger,
+  NotFoundException,
   OnModuleInit
 } from "@nestjs/common";
 import * as fs from "fs";
@@ -37,19 +38,40 @@ export class HearthstoneService implements OnModuleInit {
     return createdCard.save();
   }
 
+  async getCardTokens(cardId: string): Promise<Card[] | null> {
+    try {
+      const idRegex = new RegExp(cardId, "i");
+      const cardTokens = await this.cardModel.find({ id: idRegex }).exec();
+      cardTokens.shift();
+      return cardTokens;
+    } catch (error) {
+      //todo loger
+      console.log(error);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: `Error on obtaining card token`
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   async getCardByName(cardName: string): Promise<Card | null> {
     try {
-      return this.cardModel
+      const card = await this.cardModel
         .findOne({ name: new RegExp("^" + cardName + "$", "i") })
         .exec();
+      if (!card) throw new NotFoundException();
+      return card;
     } catch (error) {
       console.error(error);
       throw new HttpException(
         {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: "Error Interno"
+          status: HttpStatus.NOT_FOUND,
+          error: `Card with name: ${cardName} not found`
         },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.NOT_FOUND
       );
     }
   }

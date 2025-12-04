@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { HearthstoneService } from "./hearthstone.service";
 import { Card } from "./schemas/card.schema";
 import { MatchResultRawData } from "src/common/interfaces/hearthstone-cards.interface";
@@ -11,9 +11,15 @@ export class HearthstoneController {
     private readonly hearthstoneService: HearthstoneService,
     private readonly gameService: GameService
   ) {}
-  @Get("cards")
-  getCardByName(@Query("cardName") cardName: string): Promise<Card | null> {
-    return this.hearthstoneService.getCardByName(cardName);
+
+  @Get("card/:id")
+  getCardTokens(@Param("id") id: string): Promise<Card[] | null> {
+    return this.hearthstoneService.getCardTokens(id);
+  }
+
+  @Post("card")
+  getCardByName(@Body() body: { cardName: string }): Promise<Card | null> {
+    return this.hearthstoneService.getCardByName(body.cardName);
   }
 
   @Post("card-match-results")

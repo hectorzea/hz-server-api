@@ -6,7 +6,7 @@ import { AppService } from "./app.service";
 import { AiModule } from "./ai/ai.module";
 import { ConfigModule } from "@nestjs/config";
 import { TasksModule } from "./tasks/tasks.module";
-// import { HearthstoneModule } from "./hearthstone/hearthstone.module";
+import { HearthstoneModule } from "./hearthstone/hearthstone.module";
 // import { HearthstoneApiModule } from "./external-api/hearthstone.module";
 import { MongooseModule } from "@nestjs/mongoose";
 // import { GameModule } from "./game/game.module";
@@ -18,8 +18,8 @@ import { MongooseModule } from "@nestjs/mongoose";
     // MonitoringModule,
     // ExtractorModule,
     AiModule,
-    TasksModule
-    // HearthstoneModule
+    TasksModule,
+    HearthstoneModule
     // HearthstoneApiModule
     // GameModule
   ],

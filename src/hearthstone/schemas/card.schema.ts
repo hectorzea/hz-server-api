@@ -1,5 +1,11 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
+type TokenCard = {
+  name: string;
+  imagenUrl: string;
+  id: string;
+};
+
 @Schema()
 export class Card {
   @Prop({ required: true, unique: true })
@@ -10,6 +16,9 @@ export class Card {
 
   @Prop()
   imagenUrl: string; // URL a la imagen de la carta
+
+  @Prop()
+  tokens?: TokenCard[];
 }
 
 export const CardSchema = SchemaFactory.createForClass(Card);
