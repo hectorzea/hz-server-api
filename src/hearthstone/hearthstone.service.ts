@@ -41,6 +41,7 @@ export class HearthstoneService implements OnModuleInit {
   async getCardTokens(cardId: string): Promise<Card[] | null> {
     try {
       const idRegex = new RegExp(cardId, "i");
+      //TODO: ver como filtrar cartas token de una mejor manera
       const cardTokens = await this.cardModel.find({ id: idRegex }).exec();
       cardTokens.shift();
       return cardTokens;
@@ -150,14 +151,17 @@ export class HearthstoneService implements OnModuleInit {
     const cardsJsonPath = path.join(__dirname, "data", "cards.json");
     const rawData = fs.readFileSync(cardsJsonPath, "utf8");
     const hearthstoneCards = JSON.parse(rawData) as CardInfo[];
-
     for (const card of hearthstoneCards) {
       const imageUrl = `https://art.hearthstonejson.com/v1/render/latest/enUS/512x/${card.id}.png`;
 
       const cardData = {
         id: card.id,
         name: card.name,
-        imagenUrl: imageUrl
+        imagenUrl: imageUrl,
+        type: card.type,
+        collectible: card.collectible,
+        cardClass: card.cardClass,
+        set: card.set
       };
 
       const existingCard = await this.cardModel

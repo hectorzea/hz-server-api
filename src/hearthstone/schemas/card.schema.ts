@@ -6,6 +6,7 @@ type TokenCard = {
   id: string;
 };
 
+//TODO: hacer una sola estructura de tipos para carta - token
 @Schema()
 export class Card {
   @Prop({ required: true, unique: true })
@@ -19,6 +20,18 @@ export class Card {
 
   @Prop()
   tokens?: TokenCard[];
+
+  @Prop()
+  type: string;
+
+  @Prop()
+  collectible: boolean;
+
+  @Prop()
+  cardClass: string;
+
+  @Prop()
+  set: string;
 }
 
 export const CardSchema = SchemaFactory.createForClass(Card);
