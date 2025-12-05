@@ -23,6 +23,16 @@ import { GameService } from "src/game/game.service";
 @Injectable()
 export class HearthstoneService implements OnModuleInit {
   private readonly logger = new Logger(HearthstoneService.name);
+  private removableIds = [
+    "TIME_619",
+    "TIME_619e",
+    "TIME_619e2",
+    "TIME_619e3",
+    "TIME_619e4",
+    "TIME_619e5",
+    "TIME_619e6",
+    "TIME_619t"
+  ];
   constructor(
     @InjectModel(Card.name) private readonly cardModel: Model<Card>,
     private readonly extractorService: ExtractorService,
@@ -42,9 +52,13 @@ export class HearthstoneService implements OnModuleInit {
     try {
       const idRegex = new RegExp(cardId, "i");
       //TODO: ver como filtrar cartas token de una mejor manera
+      //TODO: SACAR ATTR TOKEN DE CARD?
+      //Todo: unificar modelo de cartas
       const cardTokens = await this.cardModel.find({ id: idRegex }).exec();
-      cardTokens.shift();
-      return cardTokens;
+      const filteredTokens = cardTokens.filter(
+        (e: Card) => !this.removableIds.includes(e.id)
+      );
+      return filteredTokens;
     } catch (error) {
       //todo loger
       console.log(error);
