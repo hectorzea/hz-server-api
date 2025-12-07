@@ -1,37 +1,63 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
-type TokenCard = {
-  name: string;
-  imagenUrl: string;
-  id: string;
-};
+export type CardDocument = Card & Document;
 
-//TODO: hacer una sola estructura de tipos para carta - token
 @Schema()
 export class Card {
   @Prop({ required: true, unique: true })
-  id: string; // Ejemplo: 'BT_001', 'ULD_217'
+  id: string; // 'BT_001', 'ULD_217'
 
   @Prop({ required: true })
-  name: string; // Nombre de la carta
+  name: string; // Talanji Of The Graves
 
-  @Prop()
-  imagenUrl: string; // URL a la imagen de la carta
+  @Prop({ required: true })
+  dbfId: number;
 
-  @Prop()
-  tokens?: TokenCard[];
+  @Prop({ required: false })
+  text: string;
 
-  @Prop()
-  type: string;
+  @Prop({ required: false })
+  flavor: string;
 
-  @Prop()
-  collectible: boolean;
+  @Prop({ required: false })
+  artist: string;
 
-  @Prop()
+  @Prop({ required: false })
+  attack: number;
+
+  @Prop({ required: false })
   cardClass: string;
 
-  @Prop()
+  @Prop({ required: false })
+  collectible: boolean;
+
+  @Prop({ required: false })
+  cost: number;
+
+  @Prop({ required: false })
+  elite: boolean;
+
+  @Prop({ required: false })
+  faction: string;
+
+  @Prop({ required: false })
+  health: number;
+
+  @Prop({ type: [String], required: true })
+  mechanics: string[];
+
+  @Prop({ required: false })
+  rarity: string;
+
+  @Prop({ required: true })
   set: string;
+
+  @Prop({ required: false })
+  type: string;
+
+  @Prop({ required: true })
+  imageUrl: string;
 }
 
 export const CardSchema = SchemaFactory.createForClass(Card);

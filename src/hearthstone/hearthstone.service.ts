@@ -12,7 +12,6 @@ import { Card } from "./schemas/card.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import {
-  CardInfo,
   MatchResultRawData,
   ScrappedMatchResult
 } from "src/common/interfaces/hearthstone-cards.interface";
@@ -164,18 +163,13 @@ export class HearthstoneService implements OnModuleInit {
   async prePopulateCards(): Promise<void> {
     const cardsJsonPath = path.join(__dirname, "data", "cards.json");
     const rawData = fs.readFileSync(cardsJsonPath, "utf8");
-    const hearthstoneCards = JSON.parse(rawData) as CardInfo[];
+    const hearthstoneCards = JSON.parse(rawData) as Card[];
     for (const card of hearthstoneCards) {
       const imageUrl = `https://art.hearthstonejson.com/v1/render/latest/enUS/512x/${card.id}.png`;
 
       const cardData = {
-        id: card.id,
-        name: card.name,
-        imagenUrl: imageUrl,
-        type: card.type,
-        collectible: card.collectible,
-        cardClass: card.cardClass,
-        set: card.set
+        ...card,
+        imageUrl
       };
 
       const existingCard = await this.cardModel
