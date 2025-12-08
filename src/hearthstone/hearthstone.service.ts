@@ -71,7 +71,10 @@ export class HearthstoneService implements OnModuleInit {
   async getCardByName(cardName: string): Promise<Card | null> {
     try {
       const cards = await this.cardModel
-        .find({ name: new RegExp("^" + cardName + "$", "i"), type: "MINION" })
+        .find({
+          $or: [{ type: "MINION" }, { type: "SPELL" }],
+          name: new RegExp("^" + cardName + "$", "i")
+        })
         .exec();
       const filteredCard = cards.pop();
       if (!filteredCard) throw new NotFoundException();
