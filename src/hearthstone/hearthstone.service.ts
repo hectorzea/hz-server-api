@@ -50,9 +50,6 @@ export class HearthstoneService implements OnModuleInit {
   async getCardTokens(cardId: string): Promise<Card[] | null> {
     try {
       const idRegex = new RegExp(cardId, "i");
-      //TODO: ver como filtrar cartas token de una mejor manera
-      //TODO: SACAR ATTR TOKEN DE CARD?
-      //Todo: unificar modelo de cartas
       const cardTokens = await this.cardModel.find({ id: idRegex }).exec();
       const filteredTokens = cardTokens.filter(
         (e: Card) => !this.removableIds.includes(e.id)
@@ -73,11 +70,12 @@ export class HearthstoneService implements OnModuleInit {
 
   async getCardByName(cardName: string): Promise<Card | null> {
     try {
-      const card = await this.cardModel
-        .findOne({ name: new RegExp("^" + cardName + "$", "i") })
+      const cards = await this.cardModel
+        .find({ name: new RegExp("^" + cardName + "$", "i"), type: "MINION" })
         .exec();
-      if (!card) throw new NotFoundException();
-      return card;
+      const filteredCard = cards.pop();
+      if (!filteredCard) throw new NotFoundException();
+      return filteredCard;
     } catch (error) {
       console.error(error);
       throw new HttpException(
