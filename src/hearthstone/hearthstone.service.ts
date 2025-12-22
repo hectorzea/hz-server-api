@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   Logger,
+  NotFoundException,
   OnModuleInit
 } from "@nestjs/common";
 import * as fs from "fs";
@@ -11,7 +12,6 @@ import { Card } from "./schemas/card.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import {
-  CardInfo,
   MatchResultRawData,
   ScrappedMatchResult
 } from "src/common/interfaces/hearthstone-cards.interface";
@@ -22,6 +22,16 @@ import { GameService } from "src/game/game.service";
 @Injectable()
 export class HearthstoneService implements OnModuleInit {
   private readonly logger = new Logger(HearthstoneService.name);
+  private removableIds = [
+    "TIME_619",
+    "TIME_619e",
+    "TIME_619e2",
+    "TIME_619e3",
+    "TIME_619e4",
+    "TIME_619e5",
+    "TIME_619e6",
+    "TIME_619t"
+  ];
   constructor(
     @InjectModel(Card.name) private readonly cardModel: Model<Card>,
     private readonly extractorService: ExtractorService,
@@ -37,19 +47,46 @@ export class HearthstoneService implements OnModuleInit {
     return createdCard.save();
   }
 
+  async getCardTokens(cardId: string): Promise<Card[] | null> {
+    try {
+      const idRegex = new RegExp(cardId, "i");
+      const cardTokens = await this.cardModel.find({ id: idRegex }).exec();
+      const filteredTokens = cardTokens.filter(
+        (e: Card) => !this.removableIds.includes(e.id)
+      );
+      return filteredTokens;
+    } catch (error) {
+      //todo loger
+      console.log(error);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: `Error on obtaining card token`
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   async getCardByName(cardName: string): Promise<Card | null> {
     try {
-      return this.cardModel
-        .findOne({ name: new RegExp("^" + cardName + "$", "i") })
+      const cards = await this.cardModel
+        .find({
+          $or: [{ type: "MINION" }, { type: "SPELL" }],
+          name: new RegExp("^" + cardName + "$", "i")
+        })
         .exec();
+      const filteredCard = cards.pop();
+      if (!filteredCard) throw new NotFoundException();
+      return filteredCard;
     } catch (error) {
       console.error(error);
       throw new HttpException(
         {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: "Error Interno"
+          status: HttpStatus.NOT_FOUND,
+          error: `Card with name: ${cardName} not found`
         },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.NOT_FOUND
       );
     }
   }
@@ -127,15 +164,13 @@ export class HearthstoneService implements OnModuleInit {
   async prePopulateCards(): Promise<void> {
     const cardsJsonPath = path.join(__dirname, "data", "cards.json");
     const rawData = fs.readFileSync(cardsJsonPath, "utf8");
-    const hearthstoneCards = JSON.parse(rawData) as CardInfo[];
-
+    const hearthstoneCards = JSON.parse(rawData) as Card[];
     for (const card of hearthstoneCards) {
       const imageUrl = `https://art.hearthstonejson.com/v1/render/latest/enUS/512x/${card.id}.png`;
 
       const cardData = {
-        id: card.id,
-        name: card.name,
-        imagenUrl: imageUrl
+        ...card,
+        imageUrl
       };
 
       const existingCard = await this.cardModel
