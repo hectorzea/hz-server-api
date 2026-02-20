@@ -5,7 +5,8 @@ import {
   Get,
   Param,
   Patch,
-  Post
+  Post,
+  Query
 } from "@nestjs/common";
 import { TasksService } from "./tasks.service";
 import { Task } from "./schemas/task.schema";
@@ -38,4 +39,16 @@ export class TasksController {
   ): Promise<{ success: boolean; message: string }> {
     return this.tasksService.deleteTask(id);
   }
+  @Get("export/file")
+  exportFile(@Query("fileName") fileName: string) {
+    return this.tasksService.exportToFile(fileName ?? "tasks.json");
+  }
+
+  // @Get("debug/crash")
+  // simulateCrash() {
+  //   this.tasksService.simulateCrash();
+  //   return { message: "crash programado en 100ms" };
+  // }
+  //TODO ruta para validar errores de sistemas / archivos
+  //TODO ruta para validar uncaught exception
 }
