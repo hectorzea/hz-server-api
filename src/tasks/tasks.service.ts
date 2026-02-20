@@ -8,7 +8,13 @@ import {
 import { Model } from "mongoose";
 import { Task } from "./schemas/task.schema";
 import { InjectModel } from "@nestjs/mongoose";
-import { TaskNotFoundError } from "src/common/errors/tasks.error";
+import {
+  TaskFileSystemError,
+  TaskNotFoundError
+} from "src/common/errors/tasks.error";
+import * as path from "path";
+import * as fs from "fs/promises";
+import * as assert from "assert";
 
 @Injectable()
 export class TasksService {
@@ -17,9 +23,9 @@ export class TasksService {
     @InjectModel(Task.name) private readonly taskModel: Model<Task>
   ) {}
 
-  getTasks(): Promise<Task[]> {
+  async getTasks(): Promise<Task[]> {
     try {
-      return this.taskModel.find({}).exec();
+      return await this.taskModel.find({}).exec();
     } catch (error) {
       this.logger.error("Error on getting tasks", error);
       throw error;
@@ -46,7 +52,10 @@ export class TasksService {
   }
 
   createTask(taskData: Task) {
-    //TODO check assert
+    assert(
+      taskData !== null && taskData !== undefined,
+      `Task Body can not be null`
+    );
     const createdTask = new this.taskModel(taskData);
     return createdTask.save();
   }
@@ -70,4 +79,34 @@ export class TasksService {
       );
     }
   }
+  //funciones que entran al sistema usualmente asincronas ya que llevan tiempo para no bloquear hilo principal
+  async exportToFile(fileName: string): Promise<string> {
+    try {
+      const tasks = await this.taskModel.find({}).exec();
+      const exportPath = path.join(process.cwd(), "public", fileName);
+      const content = JSON.stringify(tasks, null, 2);
+      await fs.writeFile(exportPath, content, "utf-8");
+      return exportPath;
+    } catch (error) {
+      const sysErr = error as NodeJS.ErrnoException;
+      console.log(`code --> ${sysErr.code}`);
+      this.logger.error(
+        `System Error al exportar: ${sysErr.code}`,
+        sysErr.stack
+      );
+      throw new TaskFileSystemError(
+        sysErr.code === "ENOENT"
+          ? "directorio 'public' no existe"
+          : sysErr.message
+      );
+    }
+  }
+  // simulateCrash(): void {
+  //PARA TESTEAR UNCAUGHTEXCEPTION
+  // setTimeout(() => {
+  //   throw new Error("💥 Error fuera del ciclo async de Express");
+  // }, 1000);
+  //PARA TESTEAR UNCAUGHTEXCEPTION
+  // Promise.reject(new Error("💥 Test unhandledRejection"));
+  // }
 }

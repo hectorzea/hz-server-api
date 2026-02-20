@@ -17,3 +17,9 @@ export class TaskValidationError extends AppError {
     );
   }
 }
+
+export class TaskFileSystemError extends AppError {
+  constructor(detail: string) {
+    super(`System Error at exporting ${detail}`, 500, "TASK_FS_ERROR");
+  }
+}
