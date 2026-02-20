@@ -1,10 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-  NotFoundException
-} from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { Model } from "mongoose";
 import { Task } from "./schemas/task.schema";
 import { InjectModel } from "@nestjs/mongoose";
@@ -24,12 +18,7 @@ export class TasksService {
   ) {}
 
   async getTasks(): Promise<Task[]> {
-    try {
-      return await this.taskModel.find({}).exec();
-    } catch (error) {
-      this.logger.error("Error on getting tasks", error);
-      throw error;
-    }
+    return this.taskModel.find({}).exec();
   }
 
   async getTaskById(id: string): Promise<Task> {
@@ -39,16 +28,11 @@ export class TasksService {
   }
 
   async updateTaskById(id: string, body: Task): Promise<Task> {
-    try {
-      const task = await this.taskModel
-        .findByIdAndUpdate(id, body, { new: true })
-        .exec();
-      if (!task) throw new TaskNotFoundError(id);
-      return task;
-    } catch (error) {
-      this.logger.error("Error on getting tasks", error);
-      throw error;
-    }
+    const task = await this.taskModel
+      .findByIdAndUpdate(id, body, { new: true })
+      .exec();
+    if (!task) throw new TaskNotFoundError(id);
+    return task;
   }
 
   createTask(taskData: Task) {
@@ -61,23 +45,12 @@ export class TasksService {
   }
 
   async deleteTask(id: string): Promise<{ success: boolean; message: string }> {
-    try {
-      const deleteResult = await this.taskModel.findByIdAndDelete(id).exec();
-      if (!deleteResult) throw new NotFoundException();
-      return {
-        success: true,
-        message: "Deleted"
-      };
-    } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: `Task with ID ${id} not found =(`
-        },
-        HttpStatus.NOT_FOUND
-      );
-    }
+    const deleteResult = await this.taskModel.findByIdAndDelete(id).exec();
+    if (!deleteResult) throw new TaskNotFoundError(id);
+    return {
+      success: true,
+      message: "Deleted"
+    };
   }
   //funciones que entran al sistema usualmente asincronas ya que llevan tiempo para no bloquear hilo principal
   async exportToFile(fileName: string): Promise<string> {
@@ -89,7 +62,6 @@ export class TasksService {
       return exportPath;
     } catch (error) {
       const sysErr = error as NodeJS.ErrnoException;
-      console.log(`code --> ${sysErr.code}`);
       this.logger.error(
         `System Error al exportar: ${sysErr.code}`,
         sysErr.stack
