@@ -48,11 +48,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
       };
     }
     if (exception instanceof HttpException) {
-      const res = exception.getResponse();
+      // const res = exception.getResponse();
       return {
         status: exception.getStatus(),
         //TODO message:typeof res === "string" ? res : (res as any).message
-        message: typeof res === "string" ? res : (res as any).message,
+        message: "test",
         code: "NEST_HTTP_EXCEPTION"
       };
     }
