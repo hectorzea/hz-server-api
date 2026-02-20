@@ -38,4 +38,6 @@ export class TasksController {
   ): Promise<{ success: boolean; message: string }> {
     return this.tasksService.deleteTask(id);
   }
+  //TODO ruta para validar errores de sistemas / archivos
+  //TODO ruta para validar uncaught exception
 }
