@@ -16,7 +16,7 @@ import { MongooseModule } from "@nestjs/mongoose";
     ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGO_DB_CLUSTER_URL!),
     TasksModule,
-    HearthstoneModule,
+    // HearthstoneModule,
     AiModule
     // HearthstoneApiModule
     // GameModule
