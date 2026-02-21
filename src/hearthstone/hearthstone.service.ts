@@ -6,7 +6,7 @@ import {
   NotFoundException,
   OnModuleInit
 } from "@nestjs/common";
-import * as fs from "fs";
+import * as fs from "fs/promises";
 import * as path from "path";
 import { Card } from "./schemas/card.schema";
 import { InjectModel } from "@nestjs/mongoose";
@@ -177,7 +177,7 @@ export class HearthstoneService implements OnModuleInit {
       process.cwd(),
       "src/hearthstone/data/cards.json"
     );
-    const rawData = fs.readFileSync(cardsJsonPath, "utf8");
+    const rawData = await fs.readFile(cardsJsonPath, "utf8");
     const hearthstoneCards = JSON.parse(rawData) as Card[];
     for (const card of hearthstoneCards) {
       const imageUrl = `https://art.hearthstonejson.com/v1/render/latest/enUS/512x/${card.id}.png`;
