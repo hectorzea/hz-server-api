@@ -40,17 +40,12 @@ export class HearthstoneService implements OnModuleInit {
 
   async onModuleInit() {
     this.logger.log("HearthstoneService onModuleInit: start");
-    console.time("prePopulateCards");
 
-    try {
-      await this.prePopulateCards();
-      this.logger.log("HearthstoneService onModuleInit: done");
-    } catch (e) {
-      this.logger.error("prePopulateCards failed", e);
-      throw e;
-    } finally {
-      console.timeEnd("prePopulateCards");
-    }
+    // ✅ Fire and forget — no bloqueamos el arranque
+    // NestJS avanza a app.listen() de inmediato
+    this.prePopulateCards().catch((err) => {
+      this.logger.error("prePopulateCards failed en background", err);
+    });
   }
 
   async create(cardData: Card): Promise<Card> {
