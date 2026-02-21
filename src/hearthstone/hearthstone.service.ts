@@ -38,7 +38,7 @@ export class HearthstoneService implements OnModuleInit {
     private readonly gameService: GameService
   ) {}
 
-  async onModuleInit() {
+  onModuleInit() {
     this.logger.log("HearthstoneService onModuleInit: start");
 
     // ✅ Fire and forget — no bloqueamos el arranque
