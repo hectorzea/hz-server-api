@@ -39,7 +39,18 @@ export class HearthstoneService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.prePopulateCards();
+    this.logger.log("HearthstoneService onModuleInit: start");
+    console.time("prePopulateCards");
+
+    try {
+      await this.prePopulateCards();
+      this.logger.log("HearthstoneService onModuleInit: done");
+    } catch (e) {
+      this.logger.error("prePopulateCards failed", e);
+      throw e;
+    } finally {
+      console.timeEnd("prePopulateCards");
+    }
   }
 
   async create(cardData: Card): Promise<Card> {
@@ -162,7 +173,10 @@ export class HearthstoneService implements OnModuleInit {
   }
 
   async prePopulateCards(): Promise<void> {
-    const cardsJsonPath = path.join(__dirname, "data", "cards.json");
+    const cardsJsonPath = path.resolve(
+      process.cwd(),
+      "src/hearthstone/data/cards.json"
+    );
     const rawData = fs.readFileSync(cardsJsonPath, "utf8");
     const hearthstoneCards = JSON.parse(rawData) as Card[];
     for (const card of hearthstoneCards) {
