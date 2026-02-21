@@ -13,10 +13,10 @@ import { MongooseModule } from "@nestjs/mongoose";
 
 @Module({
   imports: [
-    ConfigModule.forRoot()
-    // MongooseModule.forRoot(process.env.MONGO_DB_CLUSTER_URL!),
+    ConfigModule.forRoot(),
+    MongooseModule.forRoot(process.env.MONGO_DB_CLUSTER_URL!),
     // AiModule,
-    // TasksModule,
+    TasksModule
     // HearthstoneModule
     // HearthstoneApiModule
     // GameModule
