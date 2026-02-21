@@ -22,13 +22,11 @@ export class AiService implements OnModuleInit {
 
   async onModuleInit() {
     try {
-      const filePath = path.join(
-        __dirname,
-        "..",
-        "..",
+      const filePath = path.resolve(
+        process.cwd(),
         "public/ai_job_analyzer_prompt.txt"
       );
-      const filePathCV = path.join(__dirname, "..", "..", "public/my_cv.txt");
+      const filePathCV = path.resolve(process.cwd(), "public/my_cv.txt");
       this.promptTemplate = await fs.readFile(filePath, "utf8");
       this.cvTemplate = await fs.readFile(filePathCV, "utf8");
       console.log("[AiService] Templates loaded successfully.");
