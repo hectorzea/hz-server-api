@@ -1,13 +1,13 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
-// import { Logger } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
 //TODO: esto del monitoring
 // import { MonitoringInterceptor } from "./monitoring/monitoring.interceptor";
 // import { MonitoringService } from "./monitoring/monitoring.service";
 
 async function bootstrap() {
-  // const logger = new Logger("Bootstrap");
+  const logger = new Logger("Bootstrap");
   const app = await NestFactory.create(AppModule, { cors: true });
   //TODO: Monitoring en PRD revisar clase /. contenido
   // app.useGlobalInterceptors(
@@ -15,23 +15,17 @@ async function bootstrap() {
   // );
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  // process.on("uncaughtException", (err: Error) => {
-  //   logger.error("UNCAUGHT EXCEPTION — Cerrando proceso", err.stack);
-  //   process.exit(1);
-  // });
+  process.on("uncaughtException", (err: Error) => {
+    logger.error("UNCAUGHT EXCEPTION — Cerrando proceso", err.stack);
+    process.exit(1);
+  });
 
-  // process.on("unhandledRejection", (reason: unknown) => {
-  //   logger.error("UNHANDLED REJECTION", reason);
-  //   process.exit(1);
-  // });
+  process.on("unhandledRejection", (reason: unknown) => {
+    logger.error("UNHANDLED REJECTION", reason);
+    process.exit(1);
+  });
 
-  const port = process.env.PORT ?? 3001;
-
-  await app.listen(port, "0.0.0.0");
-
-  console.log(`✅ Server running on port ${port}`);
-
-  // await app.listen(process.env.PORT ?? 3001);
+  await app.listen(process.env.PORT ?? 3001);
 }
 
 bootstrap()
