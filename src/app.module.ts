@@ -10,10 +10,12 @@ import { HearthstoneModule } from "./hearthstone/hearthstone.module";
 // import { HearthstoneApiModule } from "./external-api/hearthstone.module";
 import { MongooseModule } from "@nestjs/mongoose";
 // import { GameModule } from "./game/game.module";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    EventEmitterModule.forRoot({ wildcard: true }),
     MongooseModule.forRoot(process.env.MONGO_DB_CLUSTER_URL!),
     TasksModule,
     HearthstoneModule,

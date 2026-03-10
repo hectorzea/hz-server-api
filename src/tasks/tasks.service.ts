@@ -9,12 +9,15 @@ import {
 import * as path from "path";
 import * as fs from "fs/promises";
 import * as assert from "assert";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { TaskCreatedEvent } from "./events/taskCreated.event";
 
 @Injectable()
 export class TasksService {
   private readonly logger = new Logger(TasksService.name);
   constructor(
-    @InjectModel(Task.name) private readonly taskModel: Model<Task>
+    @InjectModel(Task.name) private readonly taskModel: Model<Task>,
+    private readonly eventEmitter: EventEmitter2
   ) {}
 
   async getTasks(): Promise<Task[]> {
@@ -35,13 +38,21 @@ export class TasksService {
     return task;
   }
 
-  createTask(taskData: Task) {
+  async createTask(taskData: Task) {
     assert(
       taskData !== null && taskData !== undefined,
       `Task Body can not be null`
     );
+    //saving task on mongo
     const createdTask = new this.taskModel(taskData);
-    return createdTask.save();
+    const savedTask = await createdTask.save();
+    //event emit for task creation
+    const taskCreatedEvent = new TaskCreatedEvent();
+    taskCreatedEvent.id = savedTask._id.toString();
+    taskCreatedEvent.title = savedTask.title;
+    this.eventEmitter.emit("task.created", taskCreatedEvent);
+    //return the task document
+    return savedTask;
   }
 
   async deleteTask(id: string): Promise<{ success: boolean; message: string }> {
