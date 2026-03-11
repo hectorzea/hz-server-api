@@ -1,28 +1,36 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import { Logger } from "@nestjs/common";
+import { HzServerApiLogger } from "./logger/logger.service";
 //TODO: esto del monitoring
 // import { MonitoringInterceptor } from "./monitoring/monitoring.interceptor";
 // import { MonitoringService } from "./monitoring/monitoring.service";
 
 async function bootstrap() {
-  const logger = new Logger("Bootstrap");
+  const logger = new HzServerApiLogger();
   const app = await NestFactory.create(AppModule, { cors: true });
   //TODO: Monitoring en PRD revisar clase /. contenido
   // app.useGlobalInterceptors(
   //   new MonitoringInterceptor(app.get(MonitoringService))
   // );
-  process.on("uncaughtException", (err: Error) => {
-    logger.error("UNCAUGHT EXCEPTION — Cerrando proceso", err.stack);
-    process.exit(1);
-  });
+  // process.on("uncaughtException", (err: Error) => {
+  //   logger.error(
+  //     `UNCAUGHT EXCEPTION — Closing Process: ${err.message}`,
+  //     err.stack,
+  //     "Process"
+  //   );
+  //   process.exit(1);
+  // });
 
-  process.on("unhandledRejection", (reason: unknown) => {
-    logger.error("UNHANDLED REJECTION", reason);
-    process.exit(1);
-  });
+  // process.on("unhandledRejection", (reason: unknown) => {
+  //   const message = reason instanceof Error ? reason.message : String(reason);
+  //   const stack = reason instanceof Error ? reason.stack : undefined;
+  //   logger.error(`UNHANDLED REJECTION: ${message}`, stack, "Process");
+  //   process.exit(1);
+  // });
 
-  await app.listen(process.env.PORT ?? 3001);
+  const port = process.env.PORT ?? 3001;
+  await app.listen(port);
+  logger.log(`hz-server-api running on port -> ${port}`, "Bootstrap");
 }
 
 bootstrap()

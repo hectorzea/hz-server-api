@@ -53,6 +53,7 @@ export class HzServerApiLogger implements LoggerService {
       ),
       transports: [transportOptions.file, transportOptions.console],
       exceptionHandlers: [transportOptions.file, transportOptions.console],
+      rejectionHandlers: [transportOptions.file, transportOptions.console],
       exitOnError: false
     });
   }

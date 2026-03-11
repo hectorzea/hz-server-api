@@ -32,6 +32,8 @@ import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
   controllers: [AppController],
   providers: [
     AppService,
+    // as we have dependencies in the exception filters constructor
+    // we need to use APP_FILTER instead of app.useGlobal()
     { provide: APP_FILTER, useClass: AllExceptionsFilter }
   ]
 })
