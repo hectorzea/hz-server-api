@@ -11,9 +11,13 @@ import { HearthstoneModule } from "./hearthstone/hearthstone.module";
 import { MongooseModule } from "@nestjs/mongoose";
 // import { GameModule } from "./game/game.module";
 import { EventEmitterModule } from "@nestjs/event-emitter";
+import { LoggerModule } from "./logger/logger.module";
+import { APP_FILTER } from "@nestjs/core";
+import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
 
 @Module({
   imports: [
+    LoggerModule,
     ConfigModule.forRoot(),
     EventEmitterModule.forRoot({ wildcard: true }),
     MongooseModule.forRoot(process.env.MONGO_DB_CLUSTER_URL!),
@@ -26,6 +30,9 @@ import { EventEmitterModule } from "@nestjs/event-emitter";
     // ExtractorModule,
   ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [
+    AppService,
+    { provide: APP_FILTER, useClass: AllExceptionsFilter }
+  ]
 })
 export class AppModule {}

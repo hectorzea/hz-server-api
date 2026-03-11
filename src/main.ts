@@ -1,6 +1,5 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
 import { Logger } from "@nestjs/common";
 //TODO: esto del monitoring
 // import { MonitoringInterceptor } from "./monitoring/monitoring.interceptor";
@@ -13,8 +12,6 @@ async function bootstrap() {
   // app.useGlobalInterceptors(
   //   new MonitoringInterceptor(app.get(MonitoringService))
   // );
-  app.useGlobalFilters(new AllExceptionsFilter());
-
   process.on("uncaughtException", (err: Error) => {
     logger.error("UNCAUGHT EXCEPTION — Cerrando proceso", err.stack);
     process.exit(1);
