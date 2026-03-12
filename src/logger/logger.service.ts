@@ -15,7 +15,7 @@ export class HzServerApiLogger implements LoggerService {
     const activeExceptionHandlers: any[] = [];
     const activeRejectionHandlers: any[] = [];
 
-    // ─── Console: SIEMPRE (tanto local como producción) ───
+    // ─── Console: ALWAYS (Local & Production) ───
     const consoleTransport = new transports.Console({
       format: format.combine(
         format.colorize(),
@@ -31,9 +31,9 @@ export class HzServerApiLogger implements LoggerService {
     activeExceptionHandlers.push(consoleTransport);
     activeRejectionHandlers.push(consoleTransport);
 
-    // ─── Daily Rotate File: SOLO en local ───
-    //    En producción no tiene sentido escribir archivos
-    //    porque en Render el filesystem es efímero (se borra en cada deploy)
+    // ─── Daily Rotate File: Just Local ───
+    //    No writing on files on production
+    //    Render delete filesystem every deploy
     if (!isProduction) {
       const logDir = path.join(process.cwd(), "logs");
       if (!fs.existsSync(logDir)) {
@@ -81,8 +81,8 @@ export class HzServerApiLogger implements LoggerService {
       const lokiTransport = new LokiTransport({
         host: process.env.LOKI_HOST,
         basicAuth: `${process.env.LOKI_USER}:${process.env.LOKI_API_KEY}`,
-        // Labels que se agregan a TODOS los logs
-        // Esto te permite filtrar en Grafana con {app="hz-server-api"}
+        // labels that are being added to all logs
+        // this allows grafana to filter with {app="hz-server-api"}
         labels: {
           app: "hz-server-api",
           environment: "production"
@@ -91,51 +91,18 @@ export class HzServerApiLogger implements LoggerService {
         // Send logs as structured json
         json: true,
 
-        // Agrupa varios logs y los envía en un solo request HTTP
-        // En vez de hacer 1 request por cada log
+        // group multiple logs instead of individual
         batching: true,
 
-        // Cada 5 segundos envía el batch acumulado a Loki
         interval: 5,
 
-        // Si la conexión a Loki falla, lo logueamos en consola
-        // para no perder visibilidad del error
+        //if loki fails we show error
         onConnectionError: (err) =>
           console.error("[Loki] Connection error:", err)
       });
 
       activeTransports.push(lokiTransport);
     }
-    // ⑤ No agregamos Loki como exceptionHandler/rejectionHandler
-    //    porque el Console ya lo cubre y evitamos que un error de conexión
-    //    a Loki genere un loop infinito de errores
-
-    // const logDir = path.join(process.cwd(), "logs");
-    // if (!fs.existsSync(logDir)) {
-    //   fs.mkdirSync(logDir, { recursive: true });
-    // }
-
-    // const transportOptions = {
-    //   file: new DailyRotateFile({
-    //     filename: path.join(logDir, "application-%DATE%.log"),
-    //     datePattern: "YYYY-MM-DD",
-    //     zippedArchive: true,
-    //     maxSize: "20m",
-    //     maxFiles: "30d", // Keep logs for 30 days
-    //     auditFile: path.join(logDir, "audit.json"),
-    //     format: format.combine(format.timestamp(), format.json())
-    //   }),
-    //   console: new transports.Console({
-    //     format: format.combine(
-    //       format.colorize(),
-    //       format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    //       format.printf(({ timestamp, level, message, context }) => {
-    //         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-base-to-string
-    //         return `${timestamp} [${level}] ${context ? `[${context}] ` : ""}${message}`;
-    //       })
-    //     )
-    //   })
-    // };
 
     this.logger = createLogger({
       level: process.env.LOG_LEVEL || "info",
@@ -153,7 +120,7 @@ export class HzServerApiLogger implements LoggerService {
         format.errors({ stack: true }),
         format.json()
       ),
-      // ⑥ Usamos los arrays dinámicos en vez de valores fijos
+      // Usage of dynamic arrays
       transports: activeTransports,
       exceptionHandlers: activeExceptionHandlers,
       rejectionHandlers: activeRejectionHandlers,
