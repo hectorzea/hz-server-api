@@ -3,15 +3,15 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
-  HttpStatus,
-  Logger
+  HttpStatus
 } from "@nestjs/common";
 import { Request, Response } from "express";
 import { AppError } from "../errors/app.error";
+import { HzServerApiLogger } from "src/logger/logger.service";
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  private readonly logger = new Logger(AllExceptionsFilter.name);
+  constructor(private readonly logger: HzServerApiLogger) {}
   catch(exception: unknown, host: ArgumentsHost) {
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
@@ -22,7 +22,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (exception instanceof Error) {
       this.logger.error(
         `[${code}] ${message} | ${request.method} ${request.url}`,
-        exception.stack
+        "AllExceptionsFilter"
       );
     }
     response.status(status).json({
@@ -48,11 +48,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
       };
     }
     if (exception instanceof HttpException) {
-      // const res = exception.getResponse();
+      const res = exception.getResponse();
       return {
         status: exception.getStatus(),
-        //TODO message:typeof res === "string" ? res : (res as any).message
-        message: "test",
+        //Todo Check later
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        message: typeof res === "string" ? res : (res as any).message,
         code: "NEST_HTTP_EXCEPTION"
       };
     }
