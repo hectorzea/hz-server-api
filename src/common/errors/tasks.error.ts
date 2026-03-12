@@ -1,5 +1,6 @@
 import { AppError } from "./app.error";
 
+//TODO add more errors here
 //User Specified Errors
 export class TaskNotFoundError extends AppError {
   constructor(id: string) {
