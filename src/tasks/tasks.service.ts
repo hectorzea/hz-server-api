@@ -4,7 +4,8 @@ import { Task } from "./schemas/task.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import {
   TaskFileSystemError,
-  TaskNotFoundError
+  TaskNotFoundError,
+  TaskValidationError
 } from "src/common/errors/tasks.error";
 import * as path from "path";
 import * as fs from "fs/promises";
@@ -44,6 +45,12 @@ export class TasksService {
       taskData !== null && taskData !== undefined,
       `Task Body can not be null`
     );
+    if (taskData.title.length < 3) {
+      throw new TaskValidationError(
+        "title",
+        "Title must have more than 3 characters"
+      );
+    }
     //saving task on mongo
     const createdTask = new this.taskModel(taskData);
     const savedTask = await createdTask.save();
