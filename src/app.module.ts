@@ -17,8 +17,8 @@ import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
 
 @Module({
   imports: [
-    LoggerModule,
     ConfigModule.forRoot(),
+    LoggerModule,
     EventEmitterModule.forRoot({ wildcard: true }),
     MongooseModule.forRoot(process.env.MONGO_DB_CLUSTER_URL!),
     TasksModule,

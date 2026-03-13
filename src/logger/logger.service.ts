@@ -1,6 +1,5 @@
 import { Injectable, LoggerService } from "@nestjs/common";
 import { createLogger, format, transports, Logger } from "winston";
-import LokiTransport from "winston-loki";
 import * as DailyRotateFile from "winston-daily-rotate-file";
 import * as path from "path";
 import * as fs from "fs";
@@ -55,36 +54,18 @@ export class HzServerApiLogger implements LoggerService {
       activeRejectionHandlers.push(fileTransport);
     }
 
-    if (!isProduction) {
-      const logDir = path.join(process.cwd(), "logs");
-      if (!fs.existsSync(logDir)) {
-        fs.mkdirSync(logDir, { recursive: true });
-      }
-
-      const fileTransport = new DailyRotateFile({
-        filename: path.join(logDir, "application-%DATE%.log"),
-        datePattern: "YYYY-MM-DD",
-        zippedArchive: true,
-        maxSize: "20m",
-        maxFiles: "30d",
-        auditFile: path.join(logDir, "audit.json"),
-        format: format.combine(format.timestamp(), format.json())
-      });
-
-      activeTransports.push(fileTransport);
-      activeExceptionHandlers.push(fileTransport);
-      activeRejectionHandlers.push(fileTransport);
-    }
-
     //Production Loki
     if (isProduction && process.env.LOKI_HOST) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports
+      const LokiTransport = require("winston-loki");
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       const lokiTransport = new LokiTransport({
         host: process.env.LOKI_HOST,
         basicAuth: `${process.env.LOKI_USER}:${process.env.LOKI_API_KEY}`,
         // labels that are being added to all logs
         // this allows grafana to filter with {app="hz-server-api"}
         labels: {
-          app: "hz-server-api",
+          app: "hz-server-api-logs",
           environment: "production"
         },
 
@@ -103,7 +84,6 @@ export class HzServerApiLogger implements LoggerService {
 
       activeTransports.push(lokiTransport);
     }
-
     this.logger = createLogger({
       level: process.env.LOG_LEVEL || "info",
       levels: {
