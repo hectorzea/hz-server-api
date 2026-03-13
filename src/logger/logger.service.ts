@@ -65,7 +65,7 @@ export class HzServerApiLogger implements LoggerService {
         // labels that are being added to all logs
         // this allows grafana to filter with {app="hz-server-api"}
         labels: {
-          app: "hz-server-api-logs",
+          app: "grafanacloud-hzserverapi-logs",
           environment: "production"
         },
 
