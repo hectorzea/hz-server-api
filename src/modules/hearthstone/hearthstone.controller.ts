@@ -1,9 +1,12 @@
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { HearthstoneService } from "./hearthstone.service";
 import { Card } from "./schemas/card.schema";
-import { MatchResultRawData } from "src/common/interfaces/hearthstone-cards.interface";
-import { Game, WinRateMulliganResponse } from "src/game/schemas/game.schema";
-import { GameService } from "src/game/game.service";
+import { MatchResultRawData } from "./interfaces/hearthstone-cards.interface";
+import {
+  Game,
+  WinRateMulliganResponse
+} from "src/modules/game/schemas/game.schema";
+import { GameService } from "src/modules/game/game.service";
 
 @Controller("api/hearthstone")
 export class HearthstoneController {

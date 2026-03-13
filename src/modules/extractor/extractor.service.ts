@@ -3,8 +3,8 @@ import * as puppeteer from "puppeteer";
 import {
   MatchResultRawData,
   ScrappedMatchResult
-} from "src/common/interfaces/hearthstone-cards.interface";
-import { MatchResultEnum } from "src/game/schemas/game.schema";
+} from "../hearthstone/interfaces/hearthstone-cards.interface";
+import { MatchResultEnum } from "../game/schemas/game.schema";
 
 @Injectable()
 export class ExtractorService {

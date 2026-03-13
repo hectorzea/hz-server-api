@@ -5,16 +5,16 @@ import {
   HttpException,
   HttpStatus
 } from "@nestjs/common";
-import { AiService } from "./ai.service";
-import { JobOfferRequestBody } from "src/common/interfaces/job-offer.interface";
+import { JobOfferAiService } from "./job-offer-ai.service";
+import { JobOfferRequestBody } from "./interfaces/job-offer.interface";
 
 @Controller("ai")
-export class AiController {
-  constructor(private readonly aiService: AiService) {}
+export class JobOfferAiController {
+  constructor(private readonly jobOfferAiService: JobOfferAiService) {}
   @Post("process-job")
   async processJob(@Body() body: JobOfferRequestBody) {
     try {
-      const aiResponse = await this.aiService.processJobPosting(
+      const aiResponse = await this.jobOfferAiService.processJobPosting(
         body.linkedinJobUrl
       );
       return aiResponse;

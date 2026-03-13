@@ -14,10 +14,10 @@ import { Model } from "mongoose";
 import {
   MatchResultRawData,
   ScrappedMatchResult
-} from "src/common/interfaces/hearthstone-cards.interface";
-import { Game } from "src/game/schemas/game.schema";
-import { ExtractorService } from "src/extractor/extractor.service";
-import { GameService } from "src/game/game.service";
+} from "src/modules/hearthstone/interfaces/hearthstone-cards.interface";
+import { Game } from "src/modules/game/schemas/game.schema";
+import { ExtractorService } from "src/modules/extractor/extractor.service";
+import { GameService } from "src/modules/game/game.service";
 
 @Injectable()
 export class HearthstoneService implements OnModuleInit {
@@ -170,7 +170,7 @@ export class HearthstoneService implements OnModuleInit {
   async prePopulateCards(): Promise<void> {
     const cardsJsonPath = path.resolve(
       process.cwd(),
-      "src/hearthstone/data/cards.json"
+      "src/modules/hearthstone/data/cards.json"
     );
     const rawData = await fs.readFile(cardsJsonPath, "utf8");
     const hearthstoneCards = JSON.parse(rawData) as Card[];

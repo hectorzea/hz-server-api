@@ -1,6 +1,6 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import { HzServerApiLogger } from "./logger/logger.service";
+import { HzServerApiLogger } from "src/core/logger/logger.service";
 //TODO: esto del monitoring
 // import { MonitoringInterceptor } from "./monitoring/monitoring.interceptor";
 // import { MonitoringService } from "./monitoring/monitoring.service";

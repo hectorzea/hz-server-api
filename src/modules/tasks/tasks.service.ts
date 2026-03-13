@@ -6,13 +6,13 @@ import {
   TaskFileSystemError,
   TaskNotFoundError,
   TaskValidationError
-} from "src/common/errors/tasks.error";
+} from "./errors/tasks.error";
 import * as path from "path";
 import * as fs from "fs/promises";
 import * as assert from "assert";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { TaskCreatedEvent } from "./events/taskCreated.event";
-import { HzServerApiLogger } from "src/logger/logger.service";
+import { HzServerApiLogger } from "src/core/logger/logger.service";
 
 @Injectable()
 export class TasksService {

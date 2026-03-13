@@ -1,4 +1,4 @@
-import { AppError } from "./app.error";
+import { AppError } from "src/shared/errors/app.error";
 
 export class TaskNotFoundError extends AppError {
   constructor(id: string) {

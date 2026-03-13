@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
-import { TaskCreatedEvent } from "../events/taskCreated.event";
-import { HzServerApiLogger } from "src/logger/logger.service";
+import { TaskCreatedEvent } from "src/modules/tasks/events/taskCreated.event";
+import { HzServerApiLogger } from "src/core/logger/logger.service";
 
 @Injectable()
 export class TaskCreatedListener {

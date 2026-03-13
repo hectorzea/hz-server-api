@@ -1,4 +1,4 @@
-import { MatchResultEnum } from "src/game/schemas/game.schema";
+import { MatchResultEnum } from "src/modules/game/schemas/game.schema";
 
 export interface HearthstoneCardBodyRequest {
   cardName: string;
