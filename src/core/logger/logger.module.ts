@@ -1,5 +1,5 @@
 import { Global, Module } from "@nestjs/common";
-import { HzServerApiLogger } from "src/logger/logger.service";
+import { HzServerApiLogger } from "src/core/logger/logger.service";
 
 @Global()
 @Module({

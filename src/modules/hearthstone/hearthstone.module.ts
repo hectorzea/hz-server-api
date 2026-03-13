@@ -4,8 +4,8 @@ import { HearthstoneController } from "./hearthstone.controller";
 // import { HearthstoneApiModule } from "src/external-api/hearthstone.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Card, CardSchema } from "./schemas/card.schema";
-import { GameModule } from "src/game/game.module";
-import { ExtractorModule } from "src/extractor/extractor.module";
+import { GameModule } from "src/modules/game/game.module";
+import { ExtractorModule } from "src/modules/extractor/extractor.module";
 
 @Module({
   imports: [

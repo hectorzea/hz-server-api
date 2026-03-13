@@ -8,17 +8,14 @@ import { promises as fs } from "fs";
 import * as path from "path";
 import { ExtractorService } from "../extractor/extractor.service"; // Importa el servicio del otro módulo
 import { GoogleGenAI } from "@google/genai";
-import { JobOffer } from "src/common/interfaces/job-offer.interface";
-import { UtilityService } from "src/common/shared/utility.service";
+import { JobOffer } from "./interfaces/job-offer.interface";
+import { parseRawTextToJson } from "src/shared/utils/index";
 
 @Injectable()
-export class AiService implements OnModuleInit {
+export class JobOfferAiService implements OnModuleInit {
   private promptTemplate: string;
   private cvTemplate: string;
-  constructor(
-    private readonly extractorService: ExtractorService,
-    private readonly utilityService: UtilityService
-  ) {}
+  constructor(private readonly extractorService: ExtractorService) {}
 
   async onModuleInit() {
     try {
@@ -66,9 +63,7 @@ export class AiService implements OnModuleInit {
         model: "gemini-2.5-flash",
         contents: prompt
       });
-      const jobDetails = this.utilityService.parseRawTextToJson<JobOffer>(
-        response.text || ""
-      );
+      const jobDetails = parseRawTextToJson<JobOffer>(response.text || "");
       return jobDetails;
     } catch (error) {
       throw new HttpException(
