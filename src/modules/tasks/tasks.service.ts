@@ -23,7 +23,7 @@ export class TasksService {
   ) {}
 
   async getTasks(): Promise<Task[]> {
-    return this.taskModel.find({}).exec();
+    return await this.taskModel.find({}).exec();
   }
 
   async getTaskById(id: string): Promise<Task> {

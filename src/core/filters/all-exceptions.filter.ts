@@ -18,13 +18,19 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = context.getRequest<Request>();
     const { status, message, code } = this.resolveException(exception);
 
-    // stack trace in internal logs, never on client
-    if (exception instanceof Error) {
+    const logMessage = `[${code}] ${message} | ${request.method} ${request.url}`;
+    const logContext = "AllExceptionsFilter";
+
+    if (status >= 500) {
       this.logger.error(
-        `[${code}] ${message} | ${request.method} ${request.url}`,
-        "AllExceptionsFilter"
+        logMessage,
+        exception instanceof Error ? exception.stack : undefined,
+        logContext
       );
+    } else if (status >= 400) {
+      this.logger.warn(logMessage, logContext);
     }
+
     response.status(status).json({
       statusCode: status,
       code,
