@@ -42,6 +42,8 @@ export class JobOfferAiService implements OnModuleInit {
     const jobRawHtml =
       await this.extractorService.extractJobContent(linkedinJobUrl);
 
+    console.log(jobRawHtml);
+
     let promptFinal = this.promptTemplate.replace(
       "{my_cv_data_placeholder}",
       this.cvTemplate
@@ -60,7 +62,7 @@ export class JobOfferAiService implements OnModuleInit {
       });
       console.log("Calling AI Api...");
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3-flash-preview",
         contents: prompt
       });
       const jobDetails = parseRawTextToJson<JobOffer>(response.text || "");
