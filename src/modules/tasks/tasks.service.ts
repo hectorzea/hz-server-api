@@ -92,6 +92,48 @@ export class TasksService {
       );
     }
   }
+
+  getPathInfo() {
+    return {
+      __dirname: __dirname,
+      __filename: __filename,
+      "process.cwd()": process.cwd(),
+      explanation: {
+        __dirname: "Directorio donde vive ESTE archivo compilato (dist/)",
+        __filename: "Ruta donde vive este archivo pero ruta completa",
+        "process.cwd()": "Desde donde se ejecuta NPM run start"
+      }
+    };
+  }
+
+  getPathExamples() {
+    const distFilePath =
+      "/Users/hectorzea/dev/hz-server-api/dist/modules/tasks/tasks.service.js";
+    return {
+      "path.basename": {
+        explanation: "devuelve solo el nombre del archivo",
+        result: path.basename(distFilePath)
+      },
+      "path.dirname": {
+        explanation: "devuelve el directorio donde esta alojado el archivo?",
+        result: path.dirname(distFilePath)
+      },
+      "path.extname": {
+        explanation: "devuelve la extension del archivo",
+        result: path.extname(distFilePath)
+      },
+      "path.parse": {
+        explanation:
+          "devuelve elementos significantes del path {dir, root, base, name, ext}",
+        result: path.parse(distFilePath)
+      },
+      "path.join example": {
+        explanation: "agrega ruta",
+        result: path.join(distFilePath, "data", "casas", "file.json")
+      }
+    };
+  }
+
   // simulateCrash(): void {
   //PARA TESTEAR UNCAUGHTEXCEPTION
   // setTimeout(() => {

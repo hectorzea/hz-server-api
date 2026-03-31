@@ -44,6 +44,16 @@ export class TasksController {
     return this.tasksService.exportToFile(fileName ?? "tasks.json");
   }
 
+  @Get("files/path-info")
+  getPathInfo() {
+    return this.tasksService.getPathInfo();
+  }
+
+  @Get("files/path-examples")
+  getPathExamples() {
+    return this.tasksService.getPathExamples();
+  }
+
   // @Get("debug/crash")
   // simulateCrash() {
   //   this.tasksService.simulateCrash();
