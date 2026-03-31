@@ -42,8 +42,6 @@ export class JobOfferAiService implements OnModuleInit {
     const jobRawHtml =
       await this.extractorService.extractJobContent(linkedinJobUrl);
 
-    console.log(jobRawHtml);
-
     let promptFinal = this.promptTemplate.replace(
       "{my_cv_data_placeholder}",
       this.cvTemplate
