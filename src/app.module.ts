@@ -13,6 +13,7 @@ import { EventEmitterModule } from "@nestjs/event-emitter";
 import { LoggerModule } from "src/core/logger/logger.module";
 import { APP_FILTER } from "@nestjs/core";
 import { AllExceptionsFilter } from "src/core/filters/all-exceptions.filter";
+import { AuthModule } from "./modules/auth/auth.module";
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { AllExceptionsFilter } from "src/core/filters/all-exceptions.filter";
     MongooseModule.forRoot(process.env.MONGO_DB_CLUSTER_URL!),
     TasksModule,
     HearthstoneModule,
-    JobOfferAiModule
+    JobOfferAiModule,
+    AuthModule
     // GameModule
     // MonitoringModule,
     // ExtractorModule,

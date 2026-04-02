@@ -7,7 +7,13 @@ import { HzServerApiLogger } from "src/core/logger/logger.service";
 
 async function bootstrap() {
   const logger = new HzServerApiLogger();
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: "http://localhost:3000", // La URL exacta de tu frontend NextJS
+    credentials: true // Esto es lo que permite que el navegador guarde y envíe la httpOnly cookie
+  });
+
   //TODO: Monitoring en PRD revisar clase /. contenido
   // app.useGlobalInterceptors(
   //   new MonitoringInterceptor(app.get(MonitoringService))
