@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards
+} from "@nestjs/common";
 import { Response } from "express";
 import { AuthGuard } from "./guards/auth-guard";
 import { JwtService } from "@nestjs/jwt";
+import { Request } from "express";
 
 @Controller("api/auth")
 export class AuthController {
@@ -9,13 +19,20 @@ export class AuthController {
   @Post("login")
   async login(@Body() loginPayload: any, @Res() res: Response) {
     //TODO database integration later
-    //TODO ver como mejorar los errores inesperados internos ya que no logueo Error: secretOrPrivateKey must have a value de jwt
     // que pasa si en el login presiono varias veces login, genero multiples tokens? como funciona?
-    const accessToken = await this.jwtService.signAsync(loginPayload);
-    console.log(accessToken);
-    const refreshToken = await this.jwtService.signAsync(loginPayload, {
-      expiresIn: "7d"
+    //todo ver y menajer roles
+    const accessToken = await this.jwtService.signAsync({
+      email: loginPayload.email
     });
+    console.log(accessToken);
+    const refreshToken = await this.jwtService.signAsync(
+      {
+        email: loginPayload.email
+      },
+      {
+        expiresIn: "7d"
+      }
+    );
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -32,5 +49,42 @@ export class AuthController {
   @Get("profile")
   profile() {
     return { name: "Hector Zea" };
+  }
+
+  @Get("refresh")
+  async refresh(@Req() req: Request) {
+    const refreshToken = req.cookies["refreshToken"];
+    if (!refreshToken) {
+      throw new UnauthorizedException(
+        "Token is not present, do a login to generate it"
+      );
+    }
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: process.env.JWT_SIGNATURE_PASSWORD
+      });
+
+      console.log(payload);
+
+      const newAccessToken = await this.jwtService.signAsync({
+        email: payload.email
+      });
+
+      return { accessToken: newAccessToken };
+    } catch {
+      throw new UnauthorizedException("Refresh token expirado o inválido");
+    }
+  }
+  @Post("logout")
+  logout(@Res() res: Response) {
+    // res.clearCookie le dice al navegador: "Mata esta galleta ya mismo"
+    // Las opciones DEBEN coincidir con las que usaste al crearla
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: false, // false en local, true en prod
+      sameSite: "lax"
+    });
+
+    return res.status(200).json({ message: "Session closed" });
   }
 }
