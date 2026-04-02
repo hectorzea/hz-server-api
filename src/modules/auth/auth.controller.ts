@@ -53,6 +53,7 @@ export class AuthController {
 
   @Get("refresh")
   async refresh(@Req() req: Request) {
+    //TODO SAFE TYPING
     const refreshToken = req.cookies["refreshToken"];
     if (!refreshToken) {
       throw new UnauthorizedException(
