@@ -12,16 +12,27 @@ import { Response } from "express";
 import { AuthGuard } from "./guards/auth-guard";
 import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
+import { User, UserRegister } from "./interfaces/auth.interface";
+import { AuthService } from "./auth.service";
 
 @Controller("api/auth")
 export class AuthController {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private authService: AuthService
+  ) {}
+
+  @Post("register")
+  async register(@Body() registerPayload: UserRegister) {
+    return this.authService.register(registerPayload);
+  }
+
   @Post("login")
-  async login(@Body() loginPayload: any, @Res() res: Response) {
+  async login(@Body() loginPayload: User, @Res() res: Response) {
     //TODO database integration later
     // que pasa si en el login presiono varias veces login, genero multiples tokens? como funciona?
     //todo ver y menajer roles
-    const accessToken = await this.jwtService.signAsync({
+    const accessToken = await this.jwtService.signAsync<User>({
       email: loginPayload.email
     });
     console.log(accessToken);
@@ -53,21 +64,18 @@ export class AuthController {
 
   @Get("refresh")
   async refresh(@Req() req: Request) {
-    //TODO SAFE TYPING
-    const refreshToken = req.cookies["refreshToken"];
+    const refreshToken = req.cookies["refreshToken"] as string | undefined;
     if (!refreshToken) {
       throw new UnauthorizedException(
         "Token is not present, do a login to generate it"
       );
     }
     try {
-      const payload = await this.jwtService.verifyAsync(refreshToken, {
+      const payload = await this.jwtService.verifyAsync<User>(refreshToken, {
         secret: process.env.JWT_SIGNATURE_PASSWORD
       });
 
-      console.log(payload);
-
-      const newAccessToken = await this.jwtService.signAsync({
+      const newAccessToken = await this.jwtService.signAsync<User>({
         email: payload.email
       });
 
