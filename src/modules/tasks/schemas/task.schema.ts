@@ -1,12 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-export interface ITask {
-  title: string;
-  status: string;
-  label: string;
-  priority: string;
-}
-
 @Schema()
 export class Task {
   @Prop({ required: true })
