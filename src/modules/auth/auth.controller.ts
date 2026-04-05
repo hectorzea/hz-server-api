@@ -36,7 +36,7 @@ export class AuthController {
       email: loginPayload.email
     });
     console.log(accessToken);
-    const refreshToken = await this.jwtService.signAsync(
+    const refreshToken = await this.jwtService.signAsync<User>(
       {
         email: loginPayload.email
       },
