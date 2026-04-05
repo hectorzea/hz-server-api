@@ -1,8 +1,35 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { UserRegister } from "./interfaces/auth.interface";
+import { InjectModel } from "@nestjs/mongoose";
+import { User } from "./schemas/user.schema";
+import { Model } from "mongoose";
+import * as bcrypt from "bcrypt";
+
 @Injectable()
 export class AuthService {
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
   async register(registerPayload: UserRegister) {
-    return "";
+    const { email, password } = registerPayload;
+
+    const userExists = await this.userModel.find({ email });
+    if (!userExists) {
+      throw new BadRequestException("This email is in use");
+    }
+
+    const saltOrRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+
+    const newUser = new this.userModel({ email, password: hashedPassword });
+
+    await newUser.save();
+
+    return {
+      message: "User registered",
+      user: {
+        id: newUser._id,
+        email: newUser.email,
+        roles: newUser.roles
+      }
+    };
   }
 }
