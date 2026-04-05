@@ -21,9 +21,12 @@ export class JobOfferAiService implements OnModuleInit {
     try {
       const filePath = path.resolve(
         process.cwd(),
-        "public/ai_job_analyzer_prompt.txt"
+        "src/modules/job-offer-ai/data/ai_job_analyzer_prompt.txt"
       );
-      const filePathCV = path.resolve(process.cwd(), "public/my_cv.txt");
+      const filePathCV = path.resolve(
+        process.cwd(),
+        "src/modules/job-offer-ai/data/my_cv.txt"
+      );
       this.promptTemplate = await fs.readFile(filePath, "utf8");
       this.cvTemplate = await fs.readFile(filePathCV, "utf8");
       console.log("[AiService] Templates loaded successfully.");
