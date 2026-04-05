@@ -13,8 +13,8 @@ import { parseRawTextToJson } from "src/shared/utils/index";
 
 @Injectable()
 export class JobOfferAiService implements OnModuleInit {
-  private promptTemplate: string;
-  private cvTemplate: string;
+  private promptTemplate!: string;
+  private cvTemplate!: string;
   constructor(private readonly extractorService: ExtractorService) {}
 
   async onModuleInit() {
@@ -48,12 +48,15 @@ export class JobOfferAiService implements OnModuleInit {
     );
     promptFinal = promptFinal.replace("{job_raw_html_placeholder}", jobRawHtml);
 
-    const aiResponse = await this.callAiApi(promptFinal);
+    const aiResponse = await this.callAiApi(promptFinal, linkedinJobUrl);
 
     return aiResponse;
   }
 
-  private async callAiApi(prompt: string): Promise<JobOffer> {
+  private async callAiApi(
+    prompt: string,
+    linkedinJobUrl: string
+  ): Promise<JobOffer> {
     try {
       const ai = new GoogleGenAI({
         apiKey: process.env.GOOGLE_AI_API_KEY
@@ -64,6 +67,7 @@ export class JobOfferAiService implements OnModuleInit {
         contents: prompt
       });
       const jobDetails = parseRawTextToJson<JobOffer>(response.text || "");
+      jobDetails.jobLink = linkedinJobUrl;
       return jobDetails;
     } catch (error) {
       throw new HttpException(
