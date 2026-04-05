@@ -1,0 +1,101 @@
+## CV:
+Soy un Ingeniero de Software con enfoque en Frontend, especializado en desarrollo de interfaces de usuario robustas y escalables. Cuento con sólida experiencia trabajando con React, Next.js, Redux Toolkit, TypeScript y CSS, además de integraciones en entornos cloud y metodologías ágiles. Poseo amplia experiencia en aseguramiento de calidad a través de pruebas unitarias, UI y E2E (Playwright, Jest, React Testing Library, Cypress) e implementación de CI/CD. Busco roles desafiantes donde pueda aplicar mis habilidades técnicas y blandas, contribuir a la mejora de la UX, garantizar la escalabilidad del producto y mentorizar a desarrolladores junior.
+
+## INFORMACIÓN DE CONTACTO:
+-   **Nombre:** Hector Zea
+-   **Ubicación:** Capital Federal, Buenos Aires, Argentina.
+-   **Teléfono:** +54 9 11 70671458
+-   **Email:** zea3471@gmail.com
+-   **Portafolio:** https://frontbuild.vercel.app/es
+-   **GitHub:** https://github.com/hectorzea
+-   **LinkedIn:** https://www.linkedin.com/in/hectorazea/
+
+## EXPERIENCIA PROFESIONAL:
+
+### Ingeniero de Software en FRIDAY Insurance | Berlín, Alemania | Abril 2022 - Enero 2025
+-   Desarrollé mejoras y mantenimiento en dos aplicaciones React, utilizando Next.js, Redux Toolkit, TypeScript y CSS.
+-   Aseguré la calidad mediante flujos de CI/CD usando GitLab y automatización de pruebas (unitarias, UI y E2E) con Playwright.
+-   Implementé y gestioné tareas de monitoreo con Grafana para las APIs y Sentry para el frontend.
+-   Colaboré estrechamente en equipos ágiles con desarrolladores, product managers, diseñadores y expertos en seguros para crear y mejorar la experiencia de usuario (UX), definiendo el camino de implementación.
+-   Participé en el desarrollo, automatización y optimización de código en un ecosistema tecnológico amplio que incluyó AWS, Kubernetes, Java, Kotlin, Spring Boot y Python.
+
+### Ingeniero de Software en Eventbrite (Remoto) | San Francisco, California | 2021-2022
+-   Desarrollé mejoras en el portal de creación de eventos a través de soluciones frontend avanzadas, utilizando tecnologías modernas como React, TypeScript y Redux.
+-   Implementé diversas prácticas enfocándome en mantener un código limpio, mantenible y escalable.
+-   Apliqué principios de Desarrollo Guiado por Pruebas (TDD) con Jest y React Testing Library para mejorar la calidad del código.
+-   Realicé tareas de monitorización usando Sentry y resolución de errores dentro de la plataforma.
+-   Estimé los plazos de nuevos desarrollos y mentoré a desarrolladores junior en su crecimiento técnico.
+
+### Ingeniero de Software Frontend en CamonApp | Argentina | 2020-2021
+-   Desarrollé vistas e interfaces para mejorar el monitoreo de la experiencia de usuario, utilizando React, Redux y Context.
+-   Integré servicios backend construidos en AWS con Express y proporcioné retroalimentación a los diseñadores para refinar la UX en el desarrollo de nuevas funcionalidades.
+
+### Desarrollador Frontend en Inclusion Cloud | Argentina | 2016-2020
+-   Responsable de crear vistas e interfaces para varios clientes, abordando necesidades de negocio mediante tecnologías frontend modernas.
+-   Utilicé SAP como backend, trabajando específicamente con SAP Cloud Platform (SCP), Fiori, UI5 y JavaScript para desarrollar interfaces receptivas y en tiempo real.
+-   Adicionalmente, desarrollé aplicaciones React con pruebas de extremo a extremo (E2E) para asegurar una alta calidad de la aplicación.
+
+## EDUCACIÓN:
+-   **I.U.T Dr. Federico Rivero Palacio** | 2010-2016
+    *   Ingeniería Informática
+
+## CERTIFICACIONES:
+-   AWS Technical Essentials (Oct 2021)
+-   SAP Certified Development Associate (Abr 2018)
+-   NodeJS From 0 to Expert (Dic 2019)
+-   React + Redux + ES6 (Feb 2020)
+-   React the Complete Guide: +15Apps (MERN, Hooks, Context) (Oct 2021)
+-   React Testing Library and Jest (Sep 2021)
+-   TypeScript (Udemy)
+
+## HABILIDADES TÉCNICAS:
+
+### Testing & QA:
+-   Playwright
+-   Selenium
+-   Cypress
+-   React Testing Library
+-   Jest
+-   MSW (Mock Service Worker)
+
+### Frontend Core, Frameworks & Librerías:
+-   React
+-   Next.js
+-   Angular
+-   TypeScript
+-   JavaScript
+-   HTML5 / CSS3
+-   Redux / Redux Toolkit
+-   Context API
+-   Bootstrap, Tailwind CSS, Chakra UI
+-   UI5, Fiori
+
+### Backend, Cloud & DevOps:
+-   Node.js (Express)
+-   AWS
+-   Kubernetes
+-   GitLab CI/CD
+-   Kotlin (E2E tests), Java, Spring Boot, Python
+-   Bases de datos: SQL, NoSQL
+-   SAP Cloud Platform (SCP)
+-   Guidewire (Core-Insurance System)
+
+### Monitoreo, Herramientas & Otros:
+-   Sentry (Monitoreo de Frontend)
+-   Grafana (Monitoreo de APIs)
+-   Git
+-   Jira / Confluence
+-   Webpack, Vite
+-   APIs RESTful
+
+## METODOLOGÍAS:
+-   Scrum (Agile)
+-   TDD (Desarrollo Guiado por Pruebas)
+
+## HABILIDADES BLANDAS:
+-   Comunicación fluida (Inglés y Español)
+-   Trabajo en equipo y alta resiliencia en situaciones de estrés
+-   Resolución de problemas
+-   Aprendizaje rápido y orientación a objetivos
+-   Proactividad y atención al detalle
+-   Mentoreo (junior developers)
