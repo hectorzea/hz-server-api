@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException
+} from "@nestjs/common";
 import { UserRegister } from "./interfaces/auth.interface";
 import { InjectModel } from "@nestjs/mongoose";
 import { User } from "./schemas/user.schema";
@@ -11,8 +15,8 @@ export class AuthService {
   async register(registerPayload: UserRegister) {
     const { email, password } = registerPayload;
 
-    const userExists = await this.userModel.find({ email });
-    if (!userExists) {
+    const userExists = await this.userModel.findOne({ email });
+    if (userExists) {
       throw new BadRequestException("This email is in use");
     }
 
@@ -30,6 +34,23 @@ export class AuthService {
         email: newUser.email,
         roles: newUser.roles
       }
+    };
+  }
+  async login(loginPayload: UserRegister) {
+    const { email, password } = loginPayload;
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new UnauthorizedException("Credenciales inválidas");
+    }
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      throw new UnauthorizedException("Credenciales inválidas");
+    }
+
+    return {
+      id: String(user._id),
+      email: user.email,
+      roles: user.roles
     };
   }
 }

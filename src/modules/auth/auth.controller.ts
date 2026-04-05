@@ -9,11 +9,13 @@ import {
   UseGuards
 } from "@nestjs/common";
 import { Response } from "express";
-import { AuthGuard } from "./guards/auth-guard";
+import { AuthGuard } from "./guards/auth.guard";
 import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
-import { User, UserRegister } from "./interfaces/auth.interface";
+import { TokenPayload, User, UserRegister } from "./interfaces/auth.interface";
 import { AuthService } from "./auth.service";
+import { RolesGuard } from "./guards/roles.guard";
+import { Roles } from "./roles.decorator";
 
 @Controller("api/auth")
 export class AuthController {
@@ -28,18 +30,11 @@ export class AuthController {
   }
 
   @Post("login")
-  async login(@Body() loginPayload: User, @Res() res: Response) {
-    //TODO database integration later
-    // que pasa si en el login presiono varias veces login, genero multiples tokens? como funciona?
-    //todo ver y menajer roles
-    const accessToken = await this.jwtService.signAsync<User>({
-      email: loginPayload.email
-    });
-    console.log(accessToken);
-    const refreshToken = await this.jwtService.signAsync<User>(
-      {
-        email: loginPayload.email
-      },
+  async login(@Body() loginPayload: UserRegister, @Res() res: Response) {
+    const payload = await this.authService.login(loginPayload);
+    const accessToken = await this.jwtService.signAsync<TokenPayload>(payload);
+    const refreshToken = await this.jwtService.signAsync<TokenPayload>(
+      payload,
       {
         expiresIn: "7d"
       }
@@ -47,16 +42,16 @@ export class AuthController {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      //TODO al mover a prd cambiar este valor a true, false para pruebas locales
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
     return res.status(200).json({ accessToken });
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Get("profile")
   profile() {
     return { name: "Hector Zea" };
@@ -90,8 +85,8 @@ export class AuthController {
     // Las opciones DEBEN coincidir con las que usaste al crearla
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: false, // false en local, true en prod
-      sameSite: "lax"
+      secure: true, // false en local, true en prod
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
     });
 
     return res.status(200).json({ message: "Session closed" });
