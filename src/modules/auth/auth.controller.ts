@@ -47,7 +47,7 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    return res.status(200).json({ accessToken });
+    return res.status(200).json({ accessToken, user: payload.email });
   }
 
   @UseGuards(AuthGuard, RolesGuard)
