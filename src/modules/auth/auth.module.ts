@@ -13,7 +13,6 @@ import { User, UserSchema } from "./schemas/user.schema";
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         global: true,
-        // Ahora sí leemos la variable con seguridad de que ya existe
         secret: configService.get<string>("JWT_SIGNATURE_PASSWORD"),
         signOptions: { expiresIn: "15m" }
       })
