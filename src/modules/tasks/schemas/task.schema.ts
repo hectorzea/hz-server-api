@@ -1,25 +1,18 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-export interface ITask {
-  title: string;
-  status: string;
-  label: string;
-  priority: string;
-}
-
 @Schema()
 export class Task {
   @Prop({ required: true })
-  title: string;
+  title!: string;
 
   @Prop({ required: true })
-  status: string;
+  status!: string;
 
   @Prop()
-  label: string;
+  label!: string;
 
   @Prop({ required: true })
-  priority: string;
+  priority!: string;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);

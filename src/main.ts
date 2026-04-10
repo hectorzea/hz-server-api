@@ -1,13 +1,22 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { HzServerApiLogger } from "src/core/logger/logger.service";
+import * as cookieParser from "cookie-parser";
+import { ConfigService } from "@nestjs/config";
 //TODO: esto del monitoring
 // import { MonitoringInterceptor } from "./monitoring/monitoring.interceptor";
 // import { MonitoringService } from "./monitoring/monitoring.service";
 
 async function bootstrap() {
   const logger = new HzServerApiLogger();
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+  app.use(cookieParser());
+  app.enableCors({
+    origin: configService.get<string>("FRONTEND_API_URL"), // La URL exacta de tu frontend NextJS
+    credentials: true // Esto es lo que permite que el navegador guarde y envíe la httpOnly cookie
+  });
+
   //TODO: Monitoring en PRD revisar clase /. contenido
   // app.useGlobalInterceptors(
   //   new MonitoringInterceptor(app.get(MonitoringService))
