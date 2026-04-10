@@ -81,8 +81,6 @@ export class AuthController {
   }
   @Post("logout")
   logout(@Res() res: Response) {
-    // res.clearCookie le dice al navegador: "Mata esta galleta ya mismo"
-    // Las opciones DEBEN coincidir con las que usaste al crearla
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: true, // false en local, true en prod
