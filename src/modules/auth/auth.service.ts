@@ -30,9 +30,7 @@ export class AuthService {
     return {
       message: "User registered",
       user: {
-        id: newUser._id,
-        email: newUser.email,
-        roles: newUser.roles
+        email: newUser.email
       }
     };
   }
