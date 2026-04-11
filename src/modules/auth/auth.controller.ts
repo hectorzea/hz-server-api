@@ -71,7 +71,8 @@ export class AuthController {
       });
 
       const newAccessToken = await this.jwtService.signAsync<User>({
-        email: payload.email
+        email: payload.email,
+        roles: payload.roles
       });
 
       return { accessToken: newAccessToken };
