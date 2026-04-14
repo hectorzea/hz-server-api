@@ -16,17 +16,24 @@ import { TokenPayload, User, UserRegister } from "./interfaces/auth.interface";
 import { AuthService } from "./auth.service";
 import { RolesGuard } from "./guards/roles.guard";
 import { Roles } from "./roles.decorator";
+import { EmailService } from "src/core/email/email.service";
 
 @Controller("api/auth")
 export class AuthController {
   constructor(
     private jwtService: JwtService,
-    private authService: AuthService
+    private authService: AuthService,
+    private emailService: EmailService
   ) {}
 
   @Post("register")
+  //todo add new service for email
+  //investigate fonts
+  //investigate how to remove red errors
   async register(@Body() registerPayload: UserRegister) {
-    return this.authService.register(registerPayload);
+    const newUser = await this.authService.register(registerPayload);
+    this.emailService.sendRegisterEmail(registerPayload.email);
+    return newUser;
   }
 
   @Post("login")
