@@ -16,13 +16,14 @@ import { TokenPayload, User, UserRegister } from "./interfaces/auth.interface";
 import { AuthService } from "./auth.service";
 import { RolesGuard } from "./guards/roles.guard";
 import { Roles } from "./roles.decorator";
-import { Resend } from "resend";
+import { EmailService } from "src/core/email/email.service";
 
 @Controller("api/auth")
 export class AuthController {
   constructor(
     private jwtService: JwtService,
-    private authService: AuthService
+    private authService: AuthService,
+    private emailService: EmailService
   ) {}
 
   @Post("register")
@@ -30,19 +31,8 @@ export class AuthController {
   //investigate fonts
   //investigate how to remove red errors
   async register(@Body() registerPayload: UserRegister) {
-    const resend = new Resend(process.env.RESEND_API_KEY);
     const newUser = await this.authService.register(registerPayload);
-    try {
-      await resend.emails.send({
-        from: "HZ Server <onboarding@resend.dev>",
-        to: ["zea3471@gmail.com"],
-        subject: "¡Bienvenido a nuestra plataforma!",
-        html: "<p>Gracias por registrarte, chamo. ¡Estamos activos!</p>"
-      });
-    } catch (error) {
-      console.error("Error enviando el correo de registro:", error);
-    }
-
+    this.emailService.sendRegisterEmail(registerPayload.email);
     return newUser;
   }
 
