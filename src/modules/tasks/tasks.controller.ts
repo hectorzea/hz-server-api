@@ -47,6 +47,16 @@ export class TasksController {
       }
     }
   })
+  @ApiResponse({
+    status: 500,
+    description: "Internal Server Error",
+    schema: {
+      example: {
+        statusCode: 500,
+        message: "An internal error has ocurred"
+      }
+    }
+  })
   saveTask(@Body() body: CreateTaskDto): Promise<Task> {
     return this.tasksService.createTask(body);
   }
