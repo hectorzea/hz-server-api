@@ -2,14 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { Model } from "mongoose";
 import { Task } from "./schemas/task.schema";
 import { InjectModel } from "@nestjs/mongoose";
-import {
-  TaskFileSystemError,
-  TaskNotFoundError,
-  TaskValidationError
-} from "./errors/tasks.error";
+import { TaskFileSystemError, TaskNotFoundError } from "./errors/tasks.error";
 import * as path from "path";
 import * as fs from "fs/promises";
-import * as assert from "assert";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { TaskCreatedEvent } from "./events/taskCreated.event";
 import { HzServerApiLogger } from "src/core/logger/logger.service";
@@ -41,16 +36,6 @@ export class TasksService {
   }
 
   async createTask(taskData: Task) {
-    assert(
-      taskData !== null && taskData !== undefined,
-      `Task Body can not be null`
-    );
-    if (taskData.title.length < 3) {
-      throw new TaskValidationError(
-        "title",
-        "Title must have more than 3 characters"
-      );
-    }
     //saving task on mongo
     const createdTask = new this.taskModel(taskData);
     const savedTask = await createdTask.save();

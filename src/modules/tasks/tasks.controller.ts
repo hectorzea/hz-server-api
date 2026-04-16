@@ -10,6 +10,9 @@ import {
 } from "@nestjs/common";
 import { TasksService } from "./tasks.service";
 import { Task } from "./schemas/task.schema";
+import { ApiBody, ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { CreateTaskDto } from "./dto/create-task.dto";
+import { TaskResponseDto } from "./dto/task-response.dto";
 
 @Controller("api/tasks")
 export class TasksController {
@@ -24,7 +27,27 @@ export class TasksController {
   }
 
   @Post("/")
-  saveTask(@Body() body: Task): Promise<Task> {
+  @ApiOperation({ summary: "Creation of task" })
+  @ApiBody({ type: CreateTaskDto })
+  @ApiResponse({
+    status: 201,
+    description: "Task creation success response",
+    type: TaskResponseDto
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Body validations not passed",
+    schema: {
+      example: {
+        statusCode: 400,
+        message: [
+          "Title can not be empty",
+          "Title must have at least 3 characters"
+        ]
+      }
+    }
+  })
+  saveTask(@Body() body: CreateTaskDto): Promise<Task> {
     return this.tasksService.createTask(body);
   }
 

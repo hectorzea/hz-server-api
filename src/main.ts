@@ -4,6 +4,7 @@ import { HzServerApiLogger } from "src/core/logger/logger.service";
 import * as cookieParser from "cookie-parser";
 import { ConfigService } from "@nestjs/config";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { ValidationPipe } from "@nestjs/common";
 //TODO: esto del monitoring
 // import { MonitoringInterceptor } from "./monitoring/monitoring.interceptor";
 // import { MonitoringService } from "./monitoring/monitoring.service";
@@ -12,6 +13,13 @@ async function bootstrap() {
   const logger = new HzServerApiLogger();
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Remove fields if they are not in the DTO
+      forbidNonWhitelisted: true // throw error if we send extra fields
+    })
+  );
 
   //api spec
   const swaggerApiConfig = new DocumentBuilder()
