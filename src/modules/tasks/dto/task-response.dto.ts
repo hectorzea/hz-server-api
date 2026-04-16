@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { TaskLabel, TaskPriority, TaskStatus } from "../enums/task.enum";
 
 export class TaskResponseDto {
   @ApiProperty({ example: "64a7f9... (ID de Mongo)" })
@@ -11,20 +12,20 @@ export class TaskResponseDto {
   title!: string;
 
   @ApiProperty({
-    example: "Bug",
-    description: "Status of the task"
+    example: TaskStatus.BACKLOG,
+    enum: TaskStatus
   })
   status!: string;
 
   @ApiProperty({
-    example: "documentation",
-    enum: ["bug", "feature", "epic", "documentation", "tech-debt"]
+    example: TaskLabel.DOCUMENTATION,
+    enum: TaskLabel
   })
   label!: string;
 
   @ApiProperty({
-    example: "low",
-    enum: ["low", "high", "medium"]
+    example: TaskPriority.HIGH,
+    enum: TaskPriority
   })
   priority!: string;
 }
