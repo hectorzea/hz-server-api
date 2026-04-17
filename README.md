@@ -55,3 +55,7 @@ $ npm run test:cov
 2- ir a linkedin y loguearse y no cerrar ventana
 
 3- ejecutar api
+
+## Observability and monitoring
+
+Grafana
