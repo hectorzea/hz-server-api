@@ -29,6 +29,12 @@ asi el container de mongo levantado es reconocido por la maquina local.
 URL generada por el proyecto dockerizado
 ```http://localhost:3001/api/tasks ```
 
+## Swagger API Docs
+
+Use the following url in local to access swagger docs
+
+```http://localhost:3001/api/docs#/```
+
 
 
 ## Run tests

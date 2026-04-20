@@ -56,14 +56,13 @@ export class TasksService {
       message: "Deleted"
     };
   }
-  //funciones que entran al sistema usualmente asincronas ya que llevan tiempo para no bloquear hilo principal
   async exportToFile(fileName: string): Promise<string> {
     try {
       const tasks = await this.taskModel.find({}).exec();
       const exportPath = path.join(process.cwd(), "public", fileName);
       const content = JSON.stringify(tasks, null, 2);
       await fs.writeFile(exportPath, content, "utf-8");
-      return exportPath;
+      return "Exported";
     } catch (error) {
       const sysErr = error as NodeJS.ErrnoException;
       this.logger.error(
@@ -77,12 +76,4 @@ export class TasksService {
       );
     }
   }
-  // simulateCrash(): void {
-  //PARA TESTEAR UNCAUGHTEXCEPTION
-  // setTimeout(() => {
-  //   throw new Error("💥 Error fuera del ciclo async de Express");
-  // }, 1000);
-  //PARA TESTEAR UNCAUGHTEXCEPTION
-  // Promise.reject(new Error("💥 Test unhandledRejection"));
-  // }
 }

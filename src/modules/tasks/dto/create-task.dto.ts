@@ -1,8 +1,17 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsNotEmpty, IsString, MinLength } from "class-validator";
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength
+} from "class-validator";
 import { TaskLabel, TaskPriority, TaskStatus } from "../enums/task.enum";
 
 export class CreateTaskDto {
+  @IsOptional()
+  _id?: string;
+
   @ApiProperty({
     example: "Aprender Swagger",
     description: "Task title"
