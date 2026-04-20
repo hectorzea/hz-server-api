@@ -2,14 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { Model } from "mongoose";
 import { Task } from "./schemas/task.schema";
 import { InjectModel } from "@nestjs/mongoose";
-import {
-  TaskFileSystemError,
-  TaskNotFoundError,
-  TaskValidationError
-} from "./errors/tasks.error";
+import { TaskFileSystemError, TaskNotFoundError } from "./errors/tasks.error";
 import * as path from "path";
 import * as fs from "fs/promises";
-import * as assert from "assert";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { TaskCreatedEvent } from "./events/taskCreated.event";
 import { HzServerApiLogger } from "src/core/logger/logger.service";
@@ -41,16 +36,6 @@ export class TasksService {
   }
 
   async createTask(taskData: Task) {
-    assert(
-      taskData !== null && taskData !== undefined,
-      `Task Body can not be null`
-    );
-    if (taskData.title.length < 3) {
-      throw new TaskValidationError(
-        "title",
-        "Title must have more than 3 characters"
-      );
-    }
     //saving task on mongo
     const createdTask = new this.taskModel(taskData);
     const savedTask = await createdTask.save();
@@ -71,14 +56,13 @@ export class TasksService {
       message: "Deleted"
     };
   }
-  //funciones que entran al sistema usualmente asincronas ya que llevan tiempo para no bloquear hilo principal
   async exportToFile(fileName: string): Promise<string> {
     try {
       const tasks = await this.taskModel.find({}).exec();
       const exportPath = path.join(process.cwd(), "public", fileName);
       const content = JSON.stringify(tasks, null, 2);
       await fs.writeFile(exportPath, content, "utf-8");
-      return exportPath;
+      return "Exported";
     } catch (error) {
       const sysErr = error as NodeJS.ErrnoException;
       this.logger.error(
@@ -92,12 +76,4 @@ export class TasksService {
       );
     }
   }
-  // simulateCrash(): void {
-  //PARA TESTEAR UNCAUGHTEXCEPTION
-  // setTimeout(() => {
-  //   throw new Error("💥 Error fuera del ciclo async de Express");
-  // }, 1000);
-  //PARA TESTEAR UNCAUGHTEXCEPTION
-  // Promise.reject(new Error("💥 Test unhandledRejection"));
-  // }
 }
