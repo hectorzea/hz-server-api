@@ -9,18 +9,19 @@ import {
   JobApplication,
   JobApplicationSchema
 } from "./schemas/job-application.schema";
+import { ExtractorModule } from "../extractor/extractor.module";
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: JobApplication.name, schema: JobApplicationSchema }
-    ])
+    ]),
+    ExtractorModule
   ],
   //CAMBIAR A JOBS CONTROLLER
   // providers: [JobOfferAiService],
   // controllers: [JobOfferAiController],
   // exports: [JobOfferAiService],
-  // imports: [ExtractorModule],
   providers: [JobsService],
   exports: [JobsService],
   controllers: [JobsController]

@@ -56,6 +56,10 @@ export class ExtractorService {
     }
   }
 
+  scrape(jobLink: string) {
+    //todo seguir
+  }
+
   async getMatchNumberOfTurns(page: puppeteer.Page) {
     const content = await page.evaluate(() => {
       const numberOfTurns =

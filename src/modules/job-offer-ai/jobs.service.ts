@@ -10,13 +10,15 @@ import {
 } from "./schemas/job-application.schema";
 import { HzServerApiLogger } from "src/core/logger/logger.service";
 import { AiInternalServerError } from "./errors/ai.error";
+import { ExtractorService } from "../extractor/extractor.service";
 @Injectable()
 export class JobsService {
   constructor(
     @InjectModel(JobApplication.name)
     private jobModel: Model<JobApplicationDocument>,
     private eventEmitter: EventEmitter2,
-    private readonly logger: HzServerApiLogger
+    private readonly logger: HzServerApiLogger,
+    private readonly extractorService: ExtractorService
     // Inyecta aquí tus servicios de Scraper, AI y Cv
     // private scraperService: ScraperService,
     // private aiService: AiService,
@@ -47,7 +49,7 @@ export class JobsService {
         await job.save();
 
         // TODO finalizar esto y investigar de mejor scrapping
-        // job.rawScrapedContent = await this.scraperService.scrape(job.jobLink);
+        job.rawScrapedContent = await this.extractorService.scrape(job.jobLink);
         job.rawScrapedContent = "Contenido extraído del scraper...";
         await job.save();
       }
