@@ -11,6 +11,16 @@ import * as path from "path";
 export class ExtractorService {
   async scrapeJob() {
     const sessionPath = path.resolve(__dirname, "../../.chrome-session-data");
+    const browser: Browser = await puppeteer.launch({
+      // Puedes ponerlo en false si quieres ver qué pasa o en true una vez autenticado
+      headless: false,
+      userDataDir: sessionPath,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-blink-features=AutomationControlled"
+      ]
+    });
   }
   async extractJobContent(url: string): Promise<string> {
     if (!url || !url.startsWith("http")) {
