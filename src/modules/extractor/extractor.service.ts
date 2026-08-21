@@ -5,9 +5,13 @@ import {
   ScrappedMatchResult
 } from "../hearthstone/interfaces/hearthstone-cards.interface";
 import { MatchResultEnum } from "../game/schemas/game.schema";
+import * as path from "path";
 
 @Injectable()
 export class ExtractorService {
+  async scrapeJob() {
+    const sessionPath = path.resolve(__dirname, "../../.chrome-session-data");
+  }
   async extractJobContent(url: string): Promise<string> {
     if (!url || !url.startsWith("http")) {
       throw new Error("Invalid URL provided.");
