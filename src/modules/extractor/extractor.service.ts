@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import * as puppeteer from "puppeteer";
+import puppeteer, { Browser } from "puppeteer";
 import {
   MatchResultRawData,
   ScrappedMatchResult
@@ -9,10 +9,9 @@ import * as path from "path";
 
 @Injectable()
 export class ExtractorService {
-  async scrapeJob() {
+  async scrapeJob(jobUrl: string) {
     const sessionPath = path.resolve(__dirname, "../../.chrome-session-data");
     const browser: Browser = await puppeteer.launch({
-      // Puedes ponerlo en false si quieres ver qué pasa o en true una vez autenticado
       headless: false,
       userDataDir: sessionPath,
       args: [
@@ -21,6 +20,36 @@ export class ExtractorService {
         "--disable-blink-features=AutomationControlled"
       ]
     });
+    const page = await browser.newPage();
+    await page.setUserAgent(
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    );
+
+    await page.goto("https://www.linkedin.com/feed/", {
+      waitUntil: "networkidle2"
+    });
+
+    const isLoggedIn = await page.evaluate(() => {
+      return !window.location.href.includes("login");
+    });
+
+    if (!isLoggedIn) {
+      console.log("Inicia sesión en la ventana de Chrome que se abrió...");
+      await page.waitForNavigation({
+        waitUntil: "networkidle2",
+        timeout: 120000
+      });
+      console.log("Sesión iniciada y guardada con éxito.");
+    }
+
+    await page.goto(jobUrl, { waitUntil: "networkidle2" });
+
+    // Tu lógica de scraping aquí...
+    //TOOD: seguir esta logica pronto...
+    const title = await page.title();
+
+    await browser.close();
+    return title;
   }
   async extractJobContent(url: string): Promise<string> {
     if (!url || !url.startsWith("http")) {
@@ -70,129 +99,129 @@ export class ExtractorService {
     }
   }
 
-  scrape(jobLink: string) {
-    //todo seguir
-  }
+  // scrape(jobLink: string) {
+  //   //todo seguir
+  // }
 
-  async getMatchNumberOfTurns(page: puppeteer.Page) {
-    const content = await page.evaluate(() => {
-      const numberOfTurns =
-        document.querySelector("dl")?.childNodes[3]?.childNodes[1]?.textContent;
-      return numberOfTurns;
-    });
+  // async getMatchNumberOfTurns(page: puppeteer.Page) {
+  //   const content = await page.evaluate(() => {
+  //     const numberOfTurns =
+  //       document.querySelector("dl")?.childNodes[3]?.childNodes[1]?.textContent;
+  //     return numberOfTurns;
+  //   });
 
-    return { numberOfTurns: parseInt(content!) };
-  }
+  //   return { numberOfTurns: parseInt(content!) };
+  // }
 
-  async getMatchClassId(page: puppeteer.Page) {
-    const titulo = await page.title();
-    //este es para obtener la clase, pero necesito saber mi nombre de usuario
-    const rawHeroesString = await page.$eval(
-      "head > meta[name='description']",
-      (element) => element.content
-    );
-    const titleParts = titulo.split("vs.");
-    const myUser = titleParts[0];
-    const indexOfMyUser = rawHeroesString.indexOf(myUser);
-    const textoDespuesDeUsuario = rawHeroesString.substring(
-      indexOfMyUser + myUser.length
-    );
-    const match = textoDespuesDeUsuario.match(/\(([^)]+)\)/);
+  // async getMatchClassId(page: puppeteer.Page) {
+  //   const titulo = await page.title();
+  //   //este es para obtener la clase, pero necesito saber mi nombre de usuario
+  //   const rawHeroesString = await page.$eval(
+  //     "head > meta[name='description']",
+  //     (element) => element.content
+  //   );
+  //   const titleParts = titulo.split("vs.");
+  //   const myUser = titleParts[0];
+  //   const indexOfMyUser = rawHeroesString.indexOf(myUser);
+  //   const textoDespuesDeUsuario = rawHeroesString.substring(
+  //     indexOfMyUser + myUser.length
+  //   );
+  //   const match = textoDespuesDeUsuario.match(/\(([^)]+)\)/);
 
-    return { myClassId: match ? match[1].toUpperCase() : "" };
-  }
+  //   return { myClassId: match ? match[1].toUpperCase() : "" };
+  // }
 
-  async getMatchOponentClassId(page: puppeteer.Page) {
-    const rawHeroesString = await page.$eval(
-      "head > meta[name='description']",
-      (element) => element.content
-    );
-    const titulo = await page.title();
-    const partes = titulo.split("vs.");
-    const enemyUser = partes[1].split("-")[0].trim();
-    const indexOfenemyUser = rawHeroesString.indexOf(enemyUser);
-    const textoDespuesDeUsuarioEnemigo = rawHeroesString.substring(
-      indexOfenemyUser + enemyUser.length
-    );
-    const matchEnemy = textoDespuesDeUsuarioEnemigo.match(/\(([^)]+)\)/);
-    return { oponentClassId: matchEnemy ? matchEnemy[1].toUpperCase() : "" };
-  }
+  // async getMatchOponentClassId(page: puppeteer.Page) {
+  //   const rawHeroesString = await page.$eval(
+  //     "head > meta[name='description']",
+  //     (element) => element.content
+  //   );
+  //   const titulo = await page.title();
+  //   const partes = titulo.split("vs.");
+  //   const enemyUser = partes[1].split("-")[0].trim();
+  //   const indexOfenemyUser = rawHeroesString.indexOf(enemyUser);
+  //   const textoDespuesDeUsuarioEnemigo = rawHeroesString.substring(
+  //     indexOfenemyUser + enemyUser.length
+  //   );
+  //   const matchEnemy = textoDespuesDeUsuarioEnemigo.match(/\(([^)]+)\)/);
+  //   return { oponentClassId: matchEnemy ? matchEnemy[1].toUpperCase() : "" };
+  // }
 
-  getMatchResult(result: boolean) {
-    return { matchResult: result ? MatchResultEnum.WIN : MatchResultEnum.LOSS };
-  }
+  // getMatchResult(result: boolean) {
+  //   return { matchResult: result ? MatchResultEnum.WIN : MatchResultEnum.LOSS };
+  // }
 
-  async getMatchDiscardedCardsNames(page: puppeteer.Page) {
-    const content = await page.evaluate(() => {
-      const playerDivs = [...document.querySelectorAll("div.player")];
-      const myPlayerDiv = playerDivs[1];
-      const myCardsMulligan = [
-        ...myPlayerDiv.querySelectorAll("div.card.mulligan")
-      ];
-      const myCardsMulliganNames = myCardsMulligan.map((div) => {
-        return div.querySelector("h1")?.textContent;
-      }) as string[];
+  // async getMatchDiscardedCardsNames(page: puppeteer.Page) {
+  //   const content = await page.evaluate(() => {
+  //     const playerDivs = [...document.querySelectorAll("div.player")];
+  //     const myPlayerDiv = playerDivs[1];
+  //     const myCardsMulligan = [
+  //       ...myPlayerDiv.querySelectorAll("div.card.mulligan")
+  //     ];
+  //     const myCardsMulliganNames = myCardsMulligan.map((div) => {
+  //       return div.querySelector("h1")?.textContent;
+  //     }) as string[];
 
-      return {
-        discardedCardsNames: myCardsMulliganNames
-      };
-    });
+  //     return {
+  //       discardedCardsNames: myCardsMulliganNames
+  //     };
+  //   });
 
-    return { discardedCardNames: content.discardedCardsNames };
-  }
+  //   return { discardedCardNames: content.discardedCardsNames };
+  // }
 
-  async getMatchInitialCardsNames(page: puppeteer.Page) {
-    const content = await page.evaluate(() => {
-      const playerDivs = [...document.querySelectorAll("div.player")];
-      const myPlayerDiv = playerDivs[1];
-      const myCardsSelected = [
-        ...myPlayerDiv.querySelectorAll("div.card:not(.mulligan)")
-      ];
-      const initialCardNames = myCardsSelected?.map((div) => {
-        return div.querySelector("h1")?.textContent;
-      }) as string[];
-      return {
-        initialCardNames: initialCardNames
-      };
-    });
+  // async getMatchInitialCardsNames(page: puppeteer.Page) {
+  //   const content = await page.evaluate(() => {
+  //     const playerDivs = [...document.querySelectorAll("div.player")];
+  //     const myPlayerDiv = playerDivs[1];
+  //     const myCardsSelected = [
+  //       ...myPlayerDiv.querySelectorAll("div.card:not(.mulligan)")
+  //     ];
+  //     const initialCardNames = myCardsSelected?.map((div) => {
+  //       return div.querySelector("h1")?.textContent;
+  //     }) as string[];
+  //     return {
+  //       initialCardNames: initialCardNames
+  //     };
+  //   });
 
-    return { initialCardsNames: content.initialCardNames };
-  }
+  //   return { initialCardsNames: content.initialCardNames };
+  // }
 
-  async scrapeMatchData(
-    page: puppeteer.Page,
-    matchResultRequest: MatchResultRawData
-  ) {
-    const numberOfTurns = await this.getMatchNumberOfTurns(page);
-    const matchResult = this.getMatchResult(matchResultRequest.win);
-    const myClassId = await this.getMatchClassId(page);
-    const oponentClassId = await this.getMatchOponentClassId(page);
-    const discardedCardsNames = await this.getMatchDiscardedCardsNames(page);
-    const initialCardsNames = await this.getMatchInitialCardsNames(page);
-    return {
-      ...numberOfTurns,
-      ...matchResult,
-      ...myClassId,
-      ...oponentClassId,
-      ...discardedCardsNames,
-      ...initialCardsNames
-    };
-  }
+  // async scrapeMatchData(
+  //   page: puppeteer.Page,
+  //   matchResultRequest: MatchResultRawData
+  // ) {
+  //   const numberOfTurns = await this.getMatchNumberOfTurns(page);
+  //   const matchResult = this.getMatchResult(matchResultRequest.win);
+  //   const myClassId = await this.getMatchClassId(page);
+  //   const oponentClassId = await this.getMatchOponentClassId(page);
+  //   const discardedCardsNames = await this.getMatchDiscardedCardsNames(page);
+  //   const initialCardsNames = await this.getMatchInitialCardsNames(page);
+  //   return {
+  //     ...numberOfTurns,
+  //     ...matchResult,
+  //     ...myClassId,
+  //     ...oponentClassId,
+  //     ...discardedCardsNames,
+  //     ...initialCardsNames
+  //   };
+  // }
 
-  async scrapeMatchUrl(
-    matchResultRequest: MatchResultRawData
-  ): Promise<ScrappedMatchResult> {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 720 });
-    await page.goto(matchResultRequest.matchUrl, { waitUntil: "networkidle0" });
-    const matchScrappedData = await this.scrapeMatchData(
-      page,
-      matchResultRequest
-    );
+  // async scrapeMatchUrl(
+  //   matchResultRequest: MatchResultRawData
+  // ): Promise<ScrappedMatchResult> {
+  //   const browser = await puppeteer.launch({ headless: true });
+  //   const page = await browser.newPage();
+  //   await page.setViewport({ width: 1280, height: 720 });
+  //   await page.goto(matchResultRequest.matchUrl, { waitUntil: "networkidle0" });
+  //   const matchScrappedData = await this.scrapeMatchData(
+  //     page,
+  //     matchResultRequest
+  //   );
 
-    return {
-      ...matchScrappedData
-    };
-  }
+  //   return {
+  //     ...matchScrappedData
+  //   };
+  // }
 }

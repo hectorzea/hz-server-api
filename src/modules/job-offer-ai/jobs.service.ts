@@ -49,8 +49,10 @@ export class JobsService {
         await job.save();
 
         // TODO finalizar esto y investigar de mejor scrapping
-        job.rawScrapedContent = await this.extractorService.scrape(job.jobLink);
-        job.rawScrapedContent = "Contenido extraído del scraper...";
+        job.rawScrapedContent = await this.extractorService.scrapeJob(
+          job.jobLink
+        );
+        // job.rawScrapedContent = "Contenido extraído del scraper...";
         await job.save();
       }
     } catch (error) {
