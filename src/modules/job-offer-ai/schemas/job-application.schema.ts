@@ -10,7 +10,7 @@ export enum JobStatus {
 }
 
 export type JobApplicationDocument = JobApplication & Document;
-
+// todo generar un mock para aiResult y tiparlo y copiarmelo al frontend
 @Schema({ timestamps: true })
 export class JobApplication {
   _id!: Types.ObjectId;

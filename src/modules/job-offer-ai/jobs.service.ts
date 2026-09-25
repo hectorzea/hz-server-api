@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
@@ -35,6 +35,12 @@ export class JobsService {
       new JobCreatedEvent(job._id.toString())
     );
 
+    return { id: job._id };
+  }
+
+  async findOne(id: string) {
+    const job = await this.jobModel.findById(id).exec();
+    if (!job) throw new NotFoundException("Job not found");
     return job;
   }
 
