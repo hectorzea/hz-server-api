@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
+import { JobOffer } from "../interfaces/job-offer.interface";
 
 export enum JobStatus {
   PENDING = "PENDING",
@@ -24,7 +25,7 @@ export class JobApplication {
   rawScrapedContent?: string;
 
   @Prop({ type: Object })
-  aiResult?: Record<string, any>;
+  aiResult?: JobOffer;
 
   @Prop({ type: Types.ObjectId, ref: "Cv" })
   cvUsed?: Types.ObjectId;
