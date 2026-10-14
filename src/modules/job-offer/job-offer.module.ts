@@ -2,8 +2,8 @@ import { Module } from "@nestjs/common";
 // import { JobOfferAiService } from "./job-offer-ai.service";
 // import { JobOfferAiController } from "./job-offer-ai.controller";
 // import { ExtractorModule } from "src/modules/extractor/extractor.module";
-import { JobsService } from "./jobs.service";
-import { JobsController } from "./jobs.controller";
+import { JobsService } from "./job-offer.service";
+import { JobsController } from "./job-offer.controller";
 import { MongooseModule } from "@nestjs/mongoose";
 import {
   JobApplication,
@@ -26,4 +26,4 @@ import { ExtractorModule } from "../extractor/extractor.module";
   exports: [JobsService],
   controllers: [JobsController]
 })
-export class JobOfferAiModule {}
+export class JobOfferModule {}
