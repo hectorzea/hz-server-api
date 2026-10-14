@@ -128,44 +128,44 @@ export class HearthstoneService implements OnModuleInit {
     return discardedCardsIds;
   }
 
-  async saveMatchResults(matchData: MatchResultRawData): Promise<Game> {
-    try {
-      this.logger.log(`Match URL: ${matchData.matchUrl}`);
-      const scrappedDataFromMatchUrl: ScrappedMatchResult =
-        await this.extractorService.scrapeMatchUrl(matchData);
+  // async saveMatchResults(matchData: MatchResultRawData): Promise<Game> {
+  //   try {
+  //     this.logger.log(`Match URL: ${matchData.matchUrl}`);
+  //     const scrappedDataFromMatchUrl: ScrappedMatchResult =
+  //       await this.extractorService.scrapeMatchUrl(matchData);
 
-      const initialCardsIds = await this.getInitialCardsIdsByCardNames(
-        scrappedDataFromMatchUrl.initialCardsNames
-      );
+  //     const initialCardsIds = await this.getInitialCardsIdsByCardNames(
+  //       scrappedDataFromMatchUrl.initialCardsNames
+  //     );
 
-      const discardedCardsIds = await this.getDiscardedCardsIdsByCardNames(
-        scrappedDataFromMatchUrl.discardedCardNames
-      );
+  //     const discardedCardsIds = await this.getDiscardedCardsIdsByCardNames(
+  //       scrappedDataFromMatchUrl.discardedCardNames
+  //     );
 
-      const payload = {
-        numberOfTurns: scrappedDataFromMatchUrl.numberOfTurns,
-        myClassId: scrappedDataFromMatchUrl.myClassId,
-        matchResult: scrappedDataFromMatchUrl.matchResult,
-        oponentClassId: scrappedDataFromMatchUrl.oponentClassId,
-        mulligan: {
-          initialCardsIds,
-          discardedCardsIds
-        }
-      };
+  //     const payload = {
+  //       numberOfTurns: scrappedDataFromMatchUrl.numberOfTurns,
+  //       myClassId: scrappedDataFromMatchUrl.myClassId,
+  //       matchResult: scrappedDataFromMatchUrl.matchResult,
+  //       oponentClassId: scrappedDataFromMatchUrl.oponentClassId,
+  //       mulligan: {
+  //         initialCardsIds,
+  //         discardedCardsIds
+  //       }
+  //     };
 
-      const matchResult = await this.gameService.create(payload);
-      return matchResult;
-    } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: "Error Interno"
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
+  //     const matchResult = await this.gameService.create(payload);
+  //     return matchResult;
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw new HttpException(
+  //       {
+  //         status: HttpStatus.INTERNAL_SERVER_ERROR,
+  //         error: "Error Interno"
+  //       },
+  //       HttpStatus.INTERNAL_SERVER_ERROR
+  //     );
+  //   }
+  // }
 
   async prePopulateCards(): Promise<void> {
     const cardsJsonPath = path.resolve(

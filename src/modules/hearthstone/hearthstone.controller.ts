@@ -25,10 +25,10 @@ export class HearthstoneController {
     return this.hearthstoneService.getCardByName(body.cardName);
   }
 
-  @Post("card-match-results")
-  async saveMatchResults(@Body() body: MatchResultRawData): Promise<Game> {
-    return this.hearthstoneService.saveMatchResults(body);
-  }
+  // @Post("card-match-results")
+  // async saveMatchResults(@Body() body: MatchResultRawData): Promise<Game> {
+  //   return this.hearthstoneService.saveMatchResults(body);
+  // }
 
   @Get("mulligan")
   getMulligan(
