@@ -4,6 +4,7 @@ import {
   Injectable,
   OnModuleInit
 } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
 import { promises as fs } from "fs";
 import * as path from "path";
 import { ExtractorService } from "../extractor/extractor.service"; // Importa el servicio del otro módulo
@@ -13,6 +14,7 @@ import { parseRawTextToJson } from "src/shared/utils/index";
 
 @Injectable()
 export class JobOfferAiService implements OnModuleInit {
+  private readonly logger = new Logger(JobOfferAiService.name);
   private promptTemplate!: string;
   private cvTemplate!: string;
   constructor(private readonly extractorService: ExtractorService) {}
@@ -29,7 +31,7 @@ export class JobOfferAiService implements OnModuleInit {
       );
       this.promptTemplate = await fs.readFile(filePath, "utf8");
       this.cvTemplate = await fs.readFile(filePathCV, "utf8");
-      console.log("[AiService] Templates loaded successfully.");
+      this.logger.log("Templates loaded successfully.");
     } catch (error) {
       throw new Error("No se pudo cargar la plantilla de IA.", {
         cause: error
@@ -64,7 +66,7 @@ export class JobOfferAiService implements OnModuleInit {
       const ai = new GoogleGenAI({
         apiKey: process.env.GOOGLE_AI_API_KEY
       });
-      console.log("Calling AI Api...");
+      this.logger.log("Calling AI Api...");
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: prompt

@@ -50,5 +50,6 @@ async function bootstrap() {
 bootstrap()
   .then(() => {})
   .catch((error) => {
+    // eslint-disable-next-line no-console
     console.error("Error starting the server:", error);
   });

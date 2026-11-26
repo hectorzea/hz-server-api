@@ -79,6 +79,7 @@ export class HzServerApiLogger implements LoggerService {
 
         //if loki fails we show error
         onConnectionError: (err) =>
+          // eslint-disable-next-line no-console
           console.error("[Loki] Connection error:", err)
       });
 

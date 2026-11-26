@@ -62,8 +62,7 @@ export class HearthstoneService implements OnModuleInit {
       );
       return filteredTokens;
     } catch (error) {
-      //todo loger
-      console.log(error);
+      this.logger.error(error);
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -86,7 +85,7 @@ export class HearthstoneService implements OnModuleInit {
       if (!filteredCard) throw new NotFoundException();
       return filteredCard;
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       throw new HttpException(
         {
           status: HttpStatus.NOT_FOUND,
@@ -156,7 +155,7 @@ export class HearthstoneService implements OnModuleInit {
       const matchResult = await this.gameService.create(payload);
       return matchResult;
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
