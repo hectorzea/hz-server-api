@@ -10,6 +10,7 @@ import { TaskCreatedEvent } from "./events/taskCreated.event";
 
 @Injectable()
 export class TasksService {
+  //para posibles usos futuros en los cuales queramos loguear algo en especifico
   private readonly logger = new Logger(TasksService.name);
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<Task>,
@@ -64,14 +65,11 @@ export class TasksService {
       return "Exported";
     } catch (error) {
       const sysErr = error as NodeJS.ErrnoException;
-      this.logger.error(
-        `System Error al exportar: ${sysErr.code}`,
-        sysErr.stack
-      );
       throw new TaskFileSystemError(
         sysErr.code === "ENOENT"
           ? "directorio 'public' no existe"
-          : sysErr.message
+          : sysErr.message,
+        { cause: error }
       );
     }
   }
