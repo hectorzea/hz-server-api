@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { Model } from "mongoose";
 import { Task } from "./schemas/task.schema";
 import { InjectModel } from "@nestjs/mongoose";
@@ -7,14 +7,14 @@ import * as path from "path";
 import * as fs from "fs/promises";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { TaskCreatedEvent } from "./events/taskCreated.event";
-import { HzServerApiLogger } from "src/core/logger/logger.service";
 
 @Injectable()
 export class TasksService {
+  //para posibles usos futuros en los cuales queramos loguear algo en especifico
+  private readonly logger = new Logger(TasksService.name);
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<Task>,
-    private readonly eventEmitter: EventEmitter2,
-    private readonly logger: HzServerApiLogger
+    private readonly eventEmitter: EventEmitter2
   ) {}
 
   async getTasks(): Promise<Task[]> {
@@ -65,14 +65,11 @@ export class TasksService {
       return "Exported";
     } catch (error) {
       const sysErr = error as NodeJS.ErrnoException;
-      this.logger.error(
-        `System Error al exportar: ${sysErr.code}`,
-        sysErr.stack
-      );
       throw new TaskFileSystemError(
         sysErr.code === "ENOENT"
           ? "directorio 'public' no existe"
-          : sysErr.message
+          : sysErr.message,
+        { cause: error }
       );
     }
   }

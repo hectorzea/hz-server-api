@@ -5,7 +5,6 @@ import {
   Post,
   Req,
   Res,
-  UnauthorizedException,
   UseGuards
 } from "@nestjs/common";
 import { Response } from "express";
@@ -16,6 +15,7 @@ import { TokenPayload, User, UserRegister } from "./interfaces/auth.interface";
 import { AuthService } from "./auth.service";
 import { RolesGuard } from "./guards/roles.guard";
 import { Roles } from "./roles.decorator";
+import { InvalidTokenError, TokenMissingError } from "./errors/auth.error";
 
 @Controller("api/auth")
 export class AuthController {
@@ -61,9 +61,7 @@ export class AuthController {
   async refresh(@Req() req: Request) {
     const refreshToken = req.cookies["refreshToken"] as string | undefined;
     if (!refreshToken) {
-      throw new UnauthorizedException(
-        "Token is not present, do a login to generate it"
-      );
+      throw new TokenMissingError("Refresh token not present, please login");
     }
     try {
       const payload = await this.jwtService.verifyAsync<User>(refreshToken, {
@@ -76,8 +74,10 @@ export class AuthController {
       });
 
       return { accessToken: newAccessToken };
-    } catch {
-      throw new UnauthorizedException("Refresh token expirado o inválido");
+    } catch (error) {
+      throw new InvalidTokenError("Invalid or expired refresh token", {
+        cause: error
+      });
     }
   }
   @Post("logout")

@@ -19,10 +19,15 @@ export class HzServerApiLogger implements LoggerService {
       format: format.combine(
         format.colorize(),
         format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-        format.printf(({ timestamp, level, message, context }) => {
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-base-to-string
-          return `${timestamp} [${level}] ${context ? `[${context}] ` : ""}${message}`;
-        })
+        format.printf(
+          ({ timestamp, level, message, context, trace, stack }) => {
+            const stackOutput = trace ?? stack;
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-base-to-string
+            const baseLog = `${timestamp} [${level}] ${context ? `[${context}] ` : ""}${message}`;
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-base-to-string
+            return stackOutput ? `${baseLog}\n${stackOutput}` : baseLog;
+          }
+        )
       )
     });
 
@@ -79,6 +84,7 @@ export class HzServerApiLogger implements LoggerService {
 
         //if loki fails we show error
         onConnectionError: (err) =>
+          // eslint-disable-next-line no-console
           console.error("[Loki] Connection error:", err)
       });
 
@@ -108,23 +114,86 @@ export class HzServerApiLogger implements LoggerService {
     });
   }
 
-  log(message: string, context?: string) {
-    this.logger.info(message, { context });
+  log(message: unknown, ...optionalParams: unknown[]) {
+    const { formattedMessage, context } = this.parseLogArgs(
+      message,
+      optionalParams
+    );
+    this.logger.info(formattedMessage, { context });
   }
 
-  error(message: string, trace?: string, context?: string) {
-    this.logger.error(message, { trace, context });
+  error(message: unknown, ...optionalParams: unknown[]) {
+    const { formattedMessage, trace, context } = this.parseErrorArgs(
+      message,
+      optionalParams
+    );
+    this.logger.error(formattedMessage, { trace, context });
   }
 
-  warn(message: string, context?: string) {
-    this.logger.warn(message, { context });
+  warn(message: unknown, ...optionalParams: unknown[]) {
+    const { formattedMessage, context } = this.parseLogArgs(
+      message,
+      optionalParams
+    );
+    this.logger.warn(formattedMessage, { context });
   }
 
-  debug(message: string, context?: string) {
-    this.logger.debug(message, { context });
+  debug(message: unknown, ...optionalParams: unknown[]) {
+    const { formattedMessage, context } = this.parseLogArgs(
+      message,
+      optionalParams
+    );
+    this.logger.debug(formattedMessage, { context });
   }
 
-  verbose(message: string, context?: string) {
-    this.logger.verbose(message, { context });
+  verbose(message: unknown, ...optionalParams: unknown[]) {
+    const { formattedMessage, context } = this.parseLogArgs(
+      message,
+      optionalParams
+    );
+    this.logger.verbose(formattedMessage, { context });
+  }
+
+  private formatMessage(message: unknown): string {
+    if (message instanceof Error) return message.message;
+    if (typeof message === "object" && message !== null)
+      return JSON.stringify(message);
+    return String(message);
+  }
+
+  private parseLogArgs(message: unknown, optionalParams: unknown[]) {
+    const lastParam = optionalParams[optionalParams.length - 1];
+    const context = typeof lastParam === "string" ? lastParam : undefined;
+    return {
+      formattedMessage: this.formatMessage(message),
+      context
+    };
+  }
+
+  private parseErrorArgs(message: unknown, optionalParams: unknown[]) {
+    // Si llaman error(msg, trace, context) -> optionalParams tiene 2 elementos
+    // Si llaman error(msg, context)       -> optionalParams tiene 1 elemento
+    let trace: string | undefined;
+    let context: string | undefined;
+
+    if (optionalParams.length >= 2) {
+      trace =
+        typeof optionalParams[0] === "string" ? optionalParams[0] : undefined;
+      context =
+        typeof optionalParams[1] === "string" ? optionalParams[1] : undefined;
+    } else if (optionalParams.length === 1) {
+      context =
+        typeof optionalParams[0] === "string" ? optionalParams[0] : undefined;
+    }
+
+    if (!trace && message instanceof Error) {
+      trace = message.stack;
+    }
+
+    return {
+      formattedMessage: this.formatMessage(message),
+      trace,
+      context
+    };
   }
 }
