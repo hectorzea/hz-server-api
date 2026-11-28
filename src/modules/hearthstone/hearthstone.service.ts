@@ -1,11 +1,5 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-  NotFoundException,
-  OnModuleInit
-} from "@nestjs/common";
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { AppError } from "src/shared/errors/app.error";
 import * as fs from "fs/promises";
 import * as path from "path";
 import { Card } from "./schemas/card.schema";
@@ -18,6 +12,12 @@ import {
 import { Game } from "src/modules/game/schemas/game.schema";
 import { ExtractorService } from "src/modules/extractor/extractor.service";
 import { GameService } from "src/modules/game/game.service";
+import {
+  CardNotFoundError,
+  CardTokensFetchError,
+  HearthstoneDatabaseError,
+  MatchSaveError
+} from "./errors/hearthstone.error";
 
 @Injectable()
 export class HearthstoneService implements OnModuleInit {
@@ -62,38 +62,33 @@ export class HearthstoneService implements OnModuleInit {
       );
       return filteredTokens;
     } catch (error) {
-      this.logger.error(error);
-      throw new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: `Error on obtaining card token`
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
+      throw new CardTokensFetchError(cardId, { cause: error });
     }
   }
 
   async getCardByName(cardName: string): Promise<Card | null> {
+    let cards: Card[];
+
     try {
-      const cards = await this.cardModel
+      cards = await this.cardModel
         .find({
           $or: [{ type: "MINION" }, { type: "SPELL" }],
           name: new RegExp("^" + cardName + "$", "i")
         })
         .exec();
-      const filteredCard = cards.pop();
-      if (!filteredCard) throw new NotFoundException();
-      return filteredCard;
     } catch (error) {
-      this.logger.error(error);
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: `Card with name: ${cardName} not found`
-        },
-        HttpStatus.NOT_FOUND
+      throw new HearthstoneDatabaseError(
+        `Failed querying card by name: ${cardName}`,
+        { cause: error }
       );
     }
+
+    const filteredCard = cards.pop();
+    if (!filteredCard) {
+      throw new CardNotFoundError(cardName);
+    }
+
+    return filteredCard;
   }
 
   async getInitialCardsIdsByCardNames(initialCardsNames: string[]) {
@@ -155,14 +150,10 @@ export class HearthstoneService implements OnModuleInit {
       const matchResult = await this.gameService.create(payload);
       return matchResult;
     } catch (error) {
-      this.logger.error(error);
-      throw new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: "Error Interno"
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
+      if (error instanceof AppError) {
+        throw error;
+      }
+      throw new MatchSaveError({ cause: error });
     }
   }
 

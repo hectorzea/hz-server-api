@@ -19,10 +19,15 @@ export class HzServerApiLogger implements LoggerService {
       format: format.combine(
         format.colorize(),
         format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-        format.printf(({ timestamp, level, message, context }) => {
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-base-to-string
-          return `${timestamp} [${level}] ${context ? `[${context}] ` : ""}${message}`;
-        })
+        format.printf(
+          ({ timestamp, level, message, context, trace, stack }) => {
+            const stackOutput = trace ?? stack;
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-base-to-string
+            const baseLog = `${timestamp} [${level}] ${context ? `[${context}] ` : ""}${message}`;
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-base-to-string
+            return stackOutput ? `${baseLog}\n${stackOutput}` : baseLog;
+          }
+        )
       )
     });
 

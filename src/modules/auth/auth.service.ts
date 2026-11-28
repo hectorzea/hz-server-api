@@ -1,13 +1,13 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException
-} from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { UserRegister } from "./interfaces/auth.interface";
 import { InjectModel } from "@nestjs/mongoose";
 import { User } from "./schemas/user.schema";
 import { Model } from "mongoose";
 import * as bcrypt from "bcrypt";
+import {
+  EmailAlreadyInUseError,
+  InvalidCredentialsError
+} from "./errors/auth.error";
 
 @Injectable()
 export class AuthService {
@@ -17,7 +17,7 @@ export class AuthService {
 
     const userExists = await this.userModel.findOne({ email });
     if (userExists) {
-      throw new BadRequestException("This email is in use");
+      throw new EmailAlreadyInUseError();
     }
 
     const saltOrRounds = 10;
@@ -38,11 +38,11 @@ export class AuthService {
     const { email, password } = loginPayload;
     const user = await this.userModel.findOne({ email });
     if (!user) {
-      throw new UnauthorizedException("Credenciales inválidas");
+      throw new InvalidCredentialsError();
     }
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      throw new UnauthorizedException("Credenciales inválidas");
+      throw new InvalidCredentialsError();
     }
 
     return {
